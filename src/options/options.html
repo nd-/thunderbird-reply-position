@@ -1,0 +1,62 @@
+<!doctype html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title data-i18n="optionsTitle"></title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <h1 data-i18n="optionsTitle"></h1>
+    <p class="intro" data-i18n="optionsIntro"></p>
+
+    <table>
+      <thead>
+        <tr>
+          <th data-i18n="optionsColumnTarget"></th>
+          <th data-i18n="optionsColumnPosition"></th>
+          <th><span class="visually-hidden" data-i18n="optionsColumnActions"></span></th>
+        </tr>
+      </thead>
+      <tbody id="rules"></tbody>
+    </table>
+
+    <p id="empty" class="empty" hidden data-i18n="optionsEmpty"></p>
+
+    <form id="add">
+      <input type="text" id="key" required />
+      <select id="position">
+        <option value="above" data-i18n="positionAbove"></option>
+        <option value="below" data-i18n="positionBelow"></option>
+      </select>
+      <button type="submit" data-i18n="optionsAdd"></button>
+      <p id="add-error" class="error" hidden data-i18n="optionsInvalidKey"></p>
+    </form>
+
+    <h2 data-i18n="optionsDefault"></h2>
+    <select id="default">
+      <option value="none" data-i18n="positionNone"></option>
+      <option value="above" data-i18n="positionAbove"></option>
+      <option value="below" data-i18n="positionBelow"></option>
+    </select>
+
+    <h2 data-i18n="optionsSignature"></h2>
+    <p class="intro" data-i18n="optionsSignatureIntro"></p>
+    <select id="signature">
+      <option value="reply" data-i18n="optionsSignatureReply"></option>
+      <option value="bottom" data-i18n="optionsSignatureBottom"></option>
+    </select>
+
+    <div class="transfer">
+      <button type="button" id="export" data-i18n="optionsExport"></button>
+      <button type="button" id="import" data-i18n="optionsImport"></button>
+      <input type="file" id="file" accept="application/json" hidden />
+      <p id="import-message" class="message" hidden></p>
+    </div>
+
+    <script src="../lib/rules.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

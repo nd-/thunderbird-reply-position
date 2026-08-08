@@ -1,0 +1,72 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+body {
+  min-width: 17rem;
+  margin: 0;
+  padding: 0.75rem;
+  font: message-box;
+  font-size: 1rem;
+}
+
+p {
+  margin: 0 0 0.6rem;
+}
+
+.state strong {
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.unavailable {
+  margin: 0;
+  color: FieldText;
+  opacity: 0.8;
+}
+
+button {
+  font: inherit;
+}
+
+#toggle {
+  width: 100%;
+  padding: 0.4rem;
+  margin-bottom: 0.7rem;
+}
+
+fieldset {
+  border: none;
+  border-top: 1px solid ThreeDShadow;
+  margin: 0;
+  padding: 0.6rem 0 0;
+}
+
+fieldset label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+}
+
+fieldset label:last-child {
+  margin-bottom: 0;
+}
+
+.confirmation {
+  margin: 0.5rem 0 0;
+  opacity: 0.8;
+}
+
+.link {
+  display: block;
+  width: 100%;
+  margin-top: 0.7rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: LinkText;
+  text-align: start;
+  text-decoration: underline;
+  cursor: pointer;
+}

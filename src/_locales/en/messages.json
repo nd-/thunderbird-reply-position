@@ -1,0 +1,76 @@
+{
+  "extensionName": {
+    "message": "Reply Position per Recipient",
+    "description": "Extension name"
+  },
+  "extensionDescription": {
+    "message": "Places the writing area above or below the quote depending on the recipient, where Thunderbird only offers a per-identity setting.",
+    "description": "Extension description"
+  },
+  "composeActionTitle": {
+    "message": "Reply position"
+  },
+
+  "positionAbove": { "message": "Above the quote" },
+  "positionBelow": { "message": "Below the quote" },
+  "positionNone": { "message": "Leave unchanged" },
+  "positionUnknown": { "message": "Undetermined" },
+
+  "popupCurrent": { "message": "Current position" },
+  "popupToggle": { "message": "Switch" },
+  "popupRememberContact": {
+    "message": "Remember for $ADDRESS$",
+    "placeholders": { "address": { "content": "$1", "example": "john@example.com" } }
+  },
+  "popupRememberDomain": {
+    "message": "Remember for all of $DOMAIN$",
+    "placeholders": { "domain": { "content": "$1", "example": "@example.com" } }
+  },
+  "popupNoRecipient": {
+    "message": "No usable recipient: the extension stays out of the way."
+  },
+  "popupFromAddressBook": {
+    "message": "This recipient comes from the address book. The extension cannot read its address without an additional permission, so it does nothing."
+  },
+  "popupNotAReply": {
+    "message": "This window is neither a reply nor a forward."
+  },
+  "popupRuleContact": { "message": "Rule for this contact" },
+  "popupRuleDomain": { "message": "Rule for this domain" },
+  "popupRuleDefault": { "message": "Default position" },
+  "popupOptions": { "message": "Manage rules" },
+  "popupSaved": { "message": "Rule saved" },
+
+  "optionsTitle": { "message": "Position rules" },
+  "optionsIntro": {
+    "message": "A rule maps an address or a domain to a position. An exact address wins over a domain, and a domain wins over the default position."
+  },
+  "optionsColumnTarget": { "message": "Address or domain" },
+  "optionsColumnPosition": { "message": "Position" },
+  "optionsColumnActions": { "message": "Actions" },
+  "optionsAdd": { "message": "Add" },
+  "optionsDelete": { "message": "Delete" },
+  "optionsNewPlaceholder": { "message": "john@company.com or @company.com" },
+  "optionsDefault": { "message": "When no rule matches" },
+  "optionsSignature": { "message": "Signature" },
+  "optionsSignatureIntro": {
+    "message": "When the reply moves, the signature follows it if it clearly belongs to it, and stays at the bottom if it closes the message. This setting only applies when the original layout gives no clue, that is when the window opens with the reply below the quote."
+  },
+  "optionsSignatureReply": { "message": "Follows the reply text" },
+  "optionsSignatureBottom": { "message": "Stays at the bottom of the message" },
+  "optionsEmpty": { "message": "No rules yet." },
+  "optionsExport": { "message": "Export" },
+  "optionsImport": { "message": "Import" },
+  "optionsImported": {
+    "message": "$NUMBER$ rules imported.",
+    "placeholders": { "number": { "content": "$1", "example": "12" } }
+  },
+  "optionsRejected": {
+    "message": "$NUMBER$ entries discarded as invalid.",
+    "placeholders": { "number": { "content": "$1", "example": "2" } }
+  },
+  "optionsInvalidKey": {
+    "message": "Enter a full address, or a domain starting with an at sign."
+  },
+  "optionsInvalidFile": { "message": "This file is not a valid rules export." }
+}

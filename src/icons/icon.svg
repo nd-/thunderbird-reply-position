@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+  <!-- Writing area: two lines of text. -->
+  <rect x="1" y="2" width="11" height="1.6" rx="0.8" fill="context-fill" fill-opacity="context-fill-opacity"/>
+  <rect x="1" y="5" width="7" height="1.6" rx="0.8" fill="context-fill" fill-opacity="context-fill-opacity"/>
+  <!-- Quote: vertical bar on the left, like a blockquote. -->
+  <rect x="1" y="9" width="1.6" height="5" rx="0.8" fill="context-fill" fill-opacity="0.55"/>
+  <rect x="4.4" y="9.4" width="10.6" height="1.4" rx="0.7" fill="context-fill" fill-opacity="0.55"/>
+  <rect x="4.4" y="12.2" width="8" height="1.4" rx="0.7" fill="context-fill" fill-opacity="0.55"/>
+</svg>

@@ -1,0 +1,131 @@
+[
+  {
+    "namespace": "testkit",
+    "functions": [
+      {
+        "name": "setPrefs",
+        "type": "function",
+        "async": true,
+        "description": "Writes preferences the compose API does not expose (reply_on_top, sig_bottom, compose_html…).",
+        "parameters": [
+          {
+            "name": "prefs",
+            "type": "object",
+            "additionalProperties": { "type": "any" }
+          }
+        ]
+      },
+      {
+        "name": "getPref",
+        "type": "function",
+        "async": true,
+        "parameters": [{ "name": "name", "type": "string" }]
+      },
+      {
+        "name": "importMessages",
+        "type": "function",
+        "async": true,
+        "description": "Imports messages into the inbox of the test account.",
+        "parameters": [
+          {
+            "name": "messages",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "content": { "type": "string", "description": "Full MIME source." }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "setStorage",
+        "type": "function",
+        "async": true,
+        "description": "Writes into the storage.local of another extension, which no API allows reaching from this one.",
+        "parameters": [
+          { "name": "extensionId", "type": "string" },
+          { "name": "items", "type": "object", "additionalProperties": { "type": "any" } }
+        ]
+      },
+      {
+        "name": "openExtensionPage",
+        "type": "function",
+        "async": true,
+        "description": "Opens a page of another extension in a tab. Returns its moz-extension URL.",
+        "parameters": [
+          { "name": "extensionId", "type": "string" },
+          { "name": "path", "type": "string" }
+        ]
+      },
+      {
+        "name": "inspectComposeAction",
+        "type": "function",
+        "async": true,
+        "description": "Describes the compose button of an extension and the panel carrying its popup. Does not open the popup: a toolbar button only obeys a trusted event.",
+        "parameters": [{ "name": "extensionId", "type": "string" }]
+      },
+      {
+        "name": "readPage",
+        "type": "function",
+        "async": true,
+        "description": "Reads elements of an already open extension document, designated by a fragment of its URL.",
+        "parameters": [
+          { "name": "urlPattern", "type": "string" },
+          { "name": "selectors", "type": "array", "items": { "type": "string" } }
+        ]
+      },
+      {
+        "name": "actOnPage",
+        "type": "function",
+        "async": true,
+        "description": "Acts on an extension document: click, typing, checkbox, form submission.",
+        "parameters": [
+          { "name": "urlPattern", "type": "string" },
+          {
+            "name": "actions",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "selector": { "type": "string" },
+                "action": { "type": "string" },
+                "value": { "type": "any", "optional": true }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "getStorage",
+        "type": "function",
+        "async": true,
+        "description": "Reads the storage.local of another extension.",
+        "parameters": [{ "name": "extensionId", "type": "string" }]
+      },
+      {
+        "name": "consoleMessages",
+        "type": "function",
+        "async": true,
+        "description": "Messages of the error console, the only way to see what failed in another extension.",
+        "parameters": []
+      },
+      {
+        "name": "writeReport",
+        "type": "function",
+        "async": true,
+        "description": "Writes the JSON report at the path held by the extensions.reply-position.reportPath pref. Returns that path.",
+        "parameters": [{ "name": "report", "type": "any" }]
+      },
+      {
+        "name": "quit",
+        "type": "function",
+        "async": true,
+        "description": "Shuts Thunderbird down.",
+        "parameters": []
+      }
+    ]
+  }
+]

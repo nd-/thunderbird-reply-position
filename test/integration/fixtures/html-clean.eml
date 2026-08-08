@@ -1,0 +1,12 @@
+Message-ID: <html-clean@reply-position.invalid>
+Date: Mon, 16 Mar 2026 15:20:00 +0100
+From: Camille Dupont <camille@sender.invalid>
+To: Test <test@thunderbird.invalid>
+Subject: Plain HTML message
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<html><body><div dir="ltr">First line of the original message.</div>
+<div dir="ltr">Second line, so that there are two nodes.</div>
+</body></html>

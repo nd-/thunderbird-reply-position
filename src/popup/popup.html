@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <p id="unavailable" class="unavailable" hidden></p>
+
+    <div id="panel" hidden>
+      <p class="state">
+        <span data-i18n="popupCurrent"></span>
+        <strong id="position"></strong>
+      </p>
+
+      <button id="toggle" type="button" data-i18n="popupToggle"></button>
+
+      <fieldset id="remember">
+        <label>
+          <input type="checkbox" id="remember-contact" />
+          <span id="label-contact"></span>
+        </label>
+        <label>
+          <input type="checkbox" id="remember-domain" />
+          <span id="label-domain"></span>
+        </label>
+      </fieldset>
+
+      <p id="confirmation" class="confirmation" hidden data-i18n="popupSaved"></p>
+    </div>
+
+    <button id="options" type="button" class="link" data-i18n="popupOptions"></button>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

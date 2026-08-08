@@ -1,0 +1,102 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+body {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+  font: message-box;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+h1 {
+  font-size: 1.4rem;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin-top: 2rem;
+}
+
+.intro {
+  opacity: 0.85;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0.5rem;
+}
+
+th {
+  text-align: start;
+  font-weight: 600;
+  border-bottom: 1px solid ThreeDShadow;
+  padding: 0.3rem 0.5rem 0.3rem 0;
+}
+
+td {
+  padding: 0.3rem 0.5rem 0.3rem 0;
+  border-bottom: 1px solid ThreeDShadow;
+}
+
+td:last-child,
+th:last-child {
+  text-align: end;
+  padding-right: 0;
+}
+
+.empty {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+form#add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+input[type="text"] {
+  flex: 1 1 16rem;
+  padding: 0.3rem;
+  font: inherit;
+}
+
+select,
+button {
+  font: inherit;
+  padding: 0.3rem;
+}
+
+.error {
+  flex-basis: 100%;
+  margin: 0;
+  color: FieldText;
+}
+
+.message {
+  margin-top: 0.6rem;
+}
+
+.transfer {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

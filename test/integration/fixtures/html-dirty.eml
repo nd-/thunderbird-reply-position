@@ -1,0 +1,17 @@
+Message-ID: <html-dirty@reply-position.invalid>
+Date: Mon, 16 Mar 2026 16:05:00 +0100
+From: Dominique Martin <dominique@sender.invalid>
+To: Test <test@thunderbird.invalid>
+Subject: HTML message loaded with head tags
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Newsletter</title>
+<style type="text/css">body { font-family: sans-serif; } .frame { border: 1px solid #ccc; }</style>
+</head><body>
+<div class="frame">Framed body, with styling in the head.</div>
+<blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px solid #ccc;padding-left:1ex">Quote already present in the original message.</blockquote>
+</body></html>

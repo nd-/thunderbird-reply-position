@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
+  "version": "0.1.0",
+  "author": "Nicolas Dorigny",
+  "default_locale": "en",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "reply-position@dataetic.fr",
+      "strict_min_version": "140.0"
+    }
+  },
+  "permissions": ["compose", "scripting", "storage"],
+  "background": {
+    "scripts": ["lib/rules.js", "background.js"]
+  },
+  "compose_action": {
+    "default_title": "__MSG_composeActionTitle__",
+    "default_popup": "popup/popup.html",
+    "default_icon": "icons/icon.svg"
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "32": "icons/icon.svg",
+    "64": "icons/icon.svg"
+  }
+}

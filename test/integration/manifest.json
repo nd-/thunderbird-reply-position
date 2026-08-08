@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Reply position test harness",
+  "description": "Test extension: runs through the matrix of compose cases and writes a JSON report. Never published, Experiment APIs are forbidden on addons.thunderbird.net.",
+  "version": "0.1",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "harness@reply-position.invalid",
+      "strict_min_version": "140.0"
+    }
+  },
+  "permissions": ["compose", "messagesRead", "accountsRead", "scripting"],
+  "background": {
+    "scripts": ["harness.js"]
+  },
+  "experiment_apis": {
+    "testkit": {
+      "schema": "api/testkit/schema.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "paths": [["testkit"]],
+        "script": "api/testkit/implementation.js"
+      }
+    }
+  }
+}

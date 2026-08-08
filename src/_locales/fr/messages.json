@@ -1,0 +1,76 @@
+{
+  "extensionName": {
+    "message": "Position de réponse par destinataire",
+    "description": "Nom de l'extension"
+  },
+  "extensionDescription": {
+    "message": "Place la zone de saisie au-dessus ou en dessous de la citation selon le destinataire, là où Thunderbird ne sait le régler que par identité.",
+    "description": "Description de l'extension"
+  },
+  "composeActionTitle": {
+    "message": "Position de la réponse"
+  },
+
+  "positionAbove": { "message": "Au-dessus de la citation" },
+  "positionBelow": { "message": "Sous la citation" },
+  "positionNone": { "message": "Ne rien changer" },
+  "positionUnknown": { "message": "Indéterminée" },
+
+  "popupCurrent": { "message": "Position actuelle" },
+  "popupToggle": { "message": "Basculer" },
+  "popupRememberContact": {
+    "message": "Retenir pour $ADRESSE$",
+    "placeholders": { "adresse": { "content": "$1", "example": "jean@example.com" } }
+  },
+  "popupRememberDomain": {
+    "message": "Retenir pour tout $DOMAINE$",
+    "placeholders": { "domaine": { "content": "$1", "example": "@example.com" } }
+  },
+  "popupNoRecipient": {
+    "message": "Aucun destinataire exploitable : l'extension n'intervient pas."
+  },
+  "popupFromAddressBook": {
+    "message": "Ce destinataire vient du carnet d'adresses. L'extension ne peut pas lire son adresse sans une permission supplémentaire, elle s'abstient."
+  },
+  "popupNotAReply": {
+    "message": "Cette fenêtre n'est ni une réponse ni un transfert."
+  },
+  "popupRuleContact": { "message": "Règle pour ce contact" },
+  "popupRuleDomain": { "message": "Règle pour ce domaine" },
+  "popupRuleDefault": { "message": "Position par défaut" },
+  "popupOptions": { "message": "Gérer les règles" },
+  "popupSaved": { "message": "Règle enregistrée" },
+
+  "optionsTitle": { "message": "Règles de position" },
+  "optionsIntro": {
+    "message": "Une règle associe une adresse ou un domaine à une position. L'adresse exacte l'emporte sur le domaine, et le domaine sur la position par défaut."
+  },
+  "optionsColumnTarget": { "message": "Adresse ou domaine" },
+  "optionsColumnPosition": { "message": "Position" },
+  "optionsColumnActions": { "message": "Actions" },
+  "optionsAdd": { "message": "Ajouter" },
+  "optionsDelete": { "message": "Supprimer" },
+  "optionsNewPlaceholder": { "message": "jean@entreprise.fr ou @entreprise.fr" },
+  "optionsDefault": { "message": "Quand aucune règle ne correspond" },
+  "optionsSignature": { "message": "Signature" },
+  "optionsSignatureIntro": {
+    "message": "Quand la réponse change de place, la signature la suit si elle lui est visiblement attachée, et reste en bas si elle clôt le message. Ce réglage ne sert que lorsque la disposition d'origine ne permet pas de trancher, c'est-à-dire quand la fenêtre s'ouvre avec la réponse sous la citation."
+  },
+  "optionsSignatureReply": { "message": "Suit le texte de la réponse" },
+  "optionsSignatureBottom": { "message": "Reste en bas du message" },
+  "optionsEmpty": { "message": "Aucune règle pour l'instant." },
+  "optionsExport": { "message": "Exporter" },
+  "optionsImport": { "message": "Importer" },
+  "optionsImported": {
+    "message": "$NOMBRE$ règles importées.",
+    "placeholders": { "nombre": { "content": "$1", "example": "12" } }
+  },
+  "optionsRejected": {
+    "message": "$NOMBRE$ entrées écartées car invalides.",
+    "placeholders": { "nombre": { "content": "$1", "example": "2" } }
+  },
+  "optionsInvalidKey": {
+    "message": "Saisir une adresse complète, ou un domaine commençant par une arrobase."
+  },
+  "optionsInvalidFile": { "message": "Ce fichier n'est pas un export de règles valide." }
+}
