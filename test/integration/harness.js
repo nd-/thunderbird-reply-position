@@ -770,6 +770,159 @@ const checkInterfaces = async (ids, extensionId) => {
     }
   }
 
+  results.push(...(await checkMime(ids, extensionId)));
+
+  return results;
+};
+
+/* Level 3: what ends up in the message itself.
+ *
+ * `saveMessage({mode:"draft"})` then `messages.getRaw()` runs the very serialisation a send
+ * would, without an SMTP server and without sending anything. Two questions:
+ *
+ *   1. does the order obtained in the DOM survive into the emitted message;
+ *   2. does replaying the rearrangement through the editor change that message. The replay
+ *      goes through innerHTML, which drops `_moz_quote` and friends, and those drive how
+ *      quoted lines are rewrapped on send. Reading the DOM cannot answer, only the raw
+ *      message can.
+ *
+ * Both composers are arranged by an injected function rather than by the extension, so that
+ * the two runs differ by one thing only, the way the nodes were moved. The extension is put
+ * on hold for the occasion by emptying its rules. */
+const MIME_MARKER = "RPMARKER";
+
+const rearrangeInComposer = (mode, marker) => {
+  const body = document.body;
+  const paragraph = [...body.children].find((n) => n.tagName === "P" && !n.className);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  const range = document.createRange();
+  range.setStart(paragraph ?? body, 0);
+  range.collapse(true);
+  selection.addRange(range);
+  document.execCommand("insertText", false, marker);
+
+  const prefix = body.querySelector(".moz-cite-prefix");
+  const quote = prefix?.nextElementSibling;
+  if (!prefix || !quote) return { moved: false };
+
+  const original = body.innerHTML;
+  body.insertBefore(prefix, body.firstChild);
+  body.insertBefore(quote, prefix.nextSibling);
+
+  if (mode === "dom") {
+    return { moved: true, replayed: false };
+  }
+
+  const rearranged = body.innerHTML;
+  body.innerHTML = original;
+  const replayed =
+    document.execCommand("selectAll") &&
+    document.execCommand("insertHTML", false, rearranged);
+  return { moved: true, replayed };
+};
+
+/* Strips what changes between two identical messages: the boundary, the identifiers, the
+ * dates, and the header block itself. What is left is the body as libmime built it. */
+const comparableBody = (raw) => {
+  if (!raw) return null;
+  const normalized = raw.replace(/\r\n/g, "\n");
+  const body = normalized.slice(normalized.indexOf("\n\n") + 2);
+  return body
+    .replace(/--+[-\w]*\d{5,}[-\w]*/g, "--BOUNDARY")
+    .replace(/boundary="[^"]*"/g, 'boundary="BOUNDARY"')
+    .trim();
+};
+
+const checkMime = async (ids, extensionId) => {
+  const results = [];
+  const note = (id, ok, detail) => results.push({ id, ok, detail });
+
+  /* The extension has to stand aside: if it rearranged the composer on its own, both runs
+   * would already have gone through the replay and there would be nothing left to compare. */
+  await browser.testkit.setStorage(extensionId, {
+    settings: { version: 1, rules: {}, defaultAction: "none", signature: "reply" },
+  });
+
+  for (const [flavour, message, html, extraPrefs = {}] of [
+    ["html", "html-clean.eml", true],
+    ["plaintext", "plaintext.eml", false],
+    /* Plain text with a signature: the case where rewrapping on send has the most to chew
+     * on, quoted lines and a signature delimiter in the same body. */
+    [
+      "plaintext-signature",
+      "plaintext.eml",
+      false,
+      {
+        [`${ID}.sig_on_reply`]: true,
+        [`${ID}.sig_bottom`]: true,
+        [`${ID}.htmlSigText`]: "-- \nTest signature",
+        [`${ID}.htmlSigFormat`]: false,
+      },
+    ],
+  ]) {
+    const bodies = {};
+    try {
+      for (const mode of ["dom", "replay"]) {
+        await browser.testkit.setPrefs({
+          ...NEUTRAL_PREFS,
+          [`${ID}.reply_on_top`]: 1,
+          [`${ID}.compose_html`]: html,
+          ...extraPrefs,
+        });
+        const tab = await browser.compose.beginReply(ids[message], "replyToSender");
+        await wait(1500);
+
+        const [injection] = await browser.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: rearrangeInComposer,
+          args: [mode, MIME_MARKER],
+        });
+        if (!injection?.result?.moved) {
+          throw new Error(`nothing to move in the ${flavour} composer`);
+        }
+
+        const saved = await browser.compose.saveMessage(tab.id, { mode: "draft" });
+        const header = saved?.messages?.[0];
+        /* getRaw hands back a File under Manifest V3, a string under V2. */
+        const rawMessage = header ? await browser.messages.getRaw(header.id) : null;
+        const raw =
+          typeof rawMessage === "string" ? rawMessage : await rawMessage?.text();
+        bodies[mode] = comparableBody(raw);
+        await browser.tabs.remove(tab.id);
+      }
+
+      /* The quote was moved to the top, so in the emitted message the cite prefix must come
+       * before the text that was typed. This is the point of the whole extension: a DOM that
+       * looks right proves nothing until the serialiser agrees. */
+      const quoteBeforeReply = (body) => {
+        const prefix = body.indexOf("wrote:");
+        const typed = body.indexOf(MIME_MARKER);
+        return prefix !== -1 && typed !== -1 && prefix < typed;
+      };
+
+      note(
+        `mime-order-follows-the-dom-${flavour}`,
+        quoteBeforeReply(bodies.replay ?? ""),
+        `cite prefix at ${bodies.replay?.indexOf("wrote:")}, typed text at ${bodies.replay?.indexOf(MIME_MARKER)}`,
+      );
+
+      const identical = bodies.dom === bodies.replay;
+      note(
+        `mime-replay-changes-nothing-${flavour}`,
+        identical,
+        identical
+          ? "the replayed body serialises exactly like the plain DOM one"
+          : `bodies differ: ${bodies.dom?.length} vs ${bodies.replay?.length} characters`,
+      );
+      if (!identical) {
+        trace(`mime bodies, ${flavour}`, { dom: bodies.dom, replay: bodies.replay });
+      }
+    } catch (e) {
+      note(`mime-${flavour}`, false, e.message);
+    }
+  }
+
   return results;
 };
 

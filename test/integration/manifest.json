@@ -9,7 +9,7 @@
       "strict_min_version": "140.0"
     }
   },
-  "permissions": ["compose", "messagesRead", "accountsRead", "scripting"],
+  "permissions": ["compose", "compose.save", "messagesRead", "accountsRead", "scripting"],
   "background": {
     "scripts": ["harness.js"]
   },
