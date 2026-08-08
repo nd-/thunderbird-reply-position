@@ -14,7 +14,7 @@ Manifest V3, Thunderbird 140 ESR and later. MPL-2.0 licence.
 A rule maps an address or a domain to a position:
 
 ```
-john@example.com  → below the quote
+alex@example.com  → below the quote
 @example.com      → above the quote
 ```
 

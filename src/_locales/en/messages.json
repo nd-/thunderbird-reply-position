@@ -20,7 +20,7 @@
   "popupToggle": { "message": "Switch" },
   "popupRememberContact": {
     "message": "Remember for $ADDRESS$",
-    "placeholders": { "address": { "content": "$1", "example": "john@example.com" } }
+    "placeholders": { "address": { "content": "$1", "example": "alex@example.com" } }
   },
   "popupRememberDomain": {
     "message": "Remember for all of $DOMAIN$",
@@ -50,7 +50,7 @@
   "optionsColumnActions": { "message": "Actions" },
   "optionsAdd": { "message": "Add" },
   "optionsDelete": { "message": "Delete" },
-  "optionsNewPlaceholder": { "message": "john@example.com or @example.com" },
+  "optionsNewPlaceholder": { "message": "alex@example.com or @example.com" },
   "optionsDefault": { "message": "When no rule matches" },
   "optionsSignature": { "message": "Signature" },
   "optionsSignatureIntro": {

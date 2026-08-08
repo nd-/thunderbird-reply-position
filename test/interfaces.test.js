@@ -269,7 +269,7 @@ describe("popup", () => {
 describe("options page", () => {
   const SETTINGS = {
     version: 1,
-    rules: { "john@example.com": "below", "@example.com": "above" },
+    rules: { "alex@example.com": "below", "@example.com": "above" },
     defaultAction: "none",
     signature: "reply",
   };
@@ -281,7 +281,7 @@ describe("options page", () => {
     const keys = [...document.querySelectorAll("#rules tr td:first-child")].map(
       (td) => td.textContent,
     );
-    assert.deepEqual(keys, ["@example.com", "john@example.com"]);
+    assert.deepEqual(keys, ["@example.com", "alex@example.com"]);
     assert.equal(document.querySelector("#empty").hidden, true);
     assert.equal(document.querySelector("#default").value, "none");
   });
@@ -302,7 +302,7 @@ describe("options page", () => {
 
     const rows = [...document.querySelectorAll("#rules tr")];
     assert.equal(rows[0].querySelector("select").value, "above"); // @example.com
-    assert.equal(rows[1].querySelector("select").value, "below"); // john@…
+    assert.equal(rows[1].querySelector("select").value, "below"); // alex@…
   });
 
   test("adding a valid rule saves it and clears the field", async () => {
@@ -351,7 +351,7 @@ describe("options page", () => {
 
     const forget = browser.calls.find((c) => c.message?.type === "forget");
     assert.equal(forget.message.key, "@example.com");
-    assert.deepEqual(Object.keys(browser.settings.rules), ["john@example.com"]);
+    assert.deepEqual(Object.keys(browser.settings.rules), ["alex@example.com"]);
   });
 
   test("changing a position from the table saves it again", async () => {

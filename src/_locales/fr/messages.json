@@ -20,7 +20,7 @@
   "popupToggle": { "message": "Basculer" },
   "popupRememberContact": {
     "message": "Retenir pour $ADRESSE$",
-    "placeholders": { "adresse": { "content": "$1", "example": "jean@example.com" } }
+    "placeholders": { "adresse": { "content": "$1", "example": "camille@example.com" } }
   },
   "popupRememberDomain": {
     "message": "Retenir pour tout $DOMAINE$",
@@ -50,7 +50,7 @@
   "optionsColumnActions": { "message": "Actions" },
   "optionsAdd": { "message": "Ajouter" },
   "optionsDelete": { "message": "Supprimer" },
-  "optionsNewPlaceholder": { "message": "jean@example.com ou @example.com" },
+  "optionsNewPlaceholder": { "message": "camille@example.com ou @example.com" },
   "optionsDefault": { "message": "Quand aucune règle ne correspond" },
   "optionsSignature": { "message": "Signature" },
   "optionsSignatureIntro": {
