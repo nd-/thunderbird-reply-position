@@ -26,7 +26,7 @@ var Rules = (() => {
   };
 
   /* Addresses come in with arbitrary case and whitespace; rule keys are stored normalized,
-   * so that a rule entered as "John@Company.COM" matches a recipient "john@company.com". */
+   * so that a rule entered as "John@Example.COM" matches a recipient "john@example.com". */
   const normalize = (value) =>
     typeof value === "string" ? value.trim().toLowerCase() : "";
 

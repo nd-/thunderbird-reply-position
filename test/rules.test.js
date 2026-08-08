@@ -12,8 +12,8 @@ const { Rules } = load(["lib/rules.js"]);
 const SETTINGS = {
   version: 1,
   rules: {
-    "john@company.com": "below",
-    "@company.com": "above",
+    "john@example.com": "below",
+    "@example.com": "above",
     "@lists.example.org": "below",
   },
   defaultAction: "none",
@@ -21,57 +21,59 @@ const SETTINGS = {
 
 describe("resolution", () => {
   test("the exact address wins over the domain", () => {
-    assert.equal(Rules.resolve(SETTINGS, "john@company.com"), "below");
+    assert.equal(Rules.resolve(SETTINGS, "john@example.com"), "below");
   });
 
   test("the domain applies when no exact address matches", () => {
-    assert.equal(Rules.resolve(SETTINGS, "mary@company.com"), "above");
+    assert.equal(Rules.resolve(SETTINGS, "mary@example.com"), "above");
   });
 
   test("with no rule, the default position", () => {
-    assert.equal(Rules.resolve(SETTINGS, "unknown@elsewhere.net"), "none");
+    assert.equal(Rules.resolve(SETTINGS, "unknown@example.net"), "none");
     assert.equal(
-      Rules.resolve({ ...SETTINGS, defaultAction: "above" }, "unknown@elsewhere.net"),
+      Rules.resolve({ ...SETTINGS, defaultAction: "above" }, "unknown@example.net"),
       "above",
     );
   });
 
   test("case and whitespace change nothing", () => {
-    assert.equal(Rules.resolve(SETTINGS, "  JOHN@Company.COM "), "below");
-    assert.equal(Rules.resolve(SETTINGS, "MARY@COMPANY.COM"), "above");
+    assert.equal(Rules.resolve(SETTINGS, "  JOHN@Example.COM "), "below");
+    assert.equal(Rules.resolve(SETTINGS, "MARY@EXAMPLE.COM"), "above");
   });
 
   test("a missing or malformed address falls back to the default", () => {
-    for (const value of ["", null, undefined, "not-an-address", "@domain.com", 42]) {
+    /* "@example.com" is a rule key, not an address: passed as a recipient it must not match
+     * the domain rule of the same name. */
+    for (const value of ["", null, undefined, "not-an-address", "@example.com", 42]) {
       assert.equal(Rules.resolve(SETTINGS, value), "none");
     }
   });
 
   test("empty settings do not break resolution", () => {
-    assert.equal(Rules.resolve({}, "john@company.com"), "none");
-    assert.equal(Rules.resolve(undefined, "john@company.com"), "none");
+    assert.equal(Rules.resolve({}, "john@example.com"), "none");
+    assert.equal(Rules.resolve(undefined, "john@example.com"), "none");
   });
 
   test("a subdomain does not match the parent domain", () => {
-    /* A rule on @company.com must not decide for @branch.company.com: those are different
+    /* A rule on @example.com must not decide for @branch.example.com: those are different
      * correspondents, and the extension has no business assuming otherwise. */
-    assert.equal(Rules.resolve(SETTINGS, "john@branch.company.com"), "none");
+    assert.equal(Rules.resolve(SETTINGS, "john@branch.example.com"), "none");
   });
 });
 
 describe("explanation", () => {
   test("tells where the chosen position comes from", () => {
-    assert.deepEqual(Rules.explain(SETTINGS, "john@company.com"), {
+    assert.deepEqual(Rules.explain(SETTINGS, "john@example.com"), {
       position: "below",
       source: "contact",
-      key: "john@company.com",
+      key: "john@example.com",
     });
-    assert.deepEqual(Rules.explain(SETTINGS, "mary@company.com"), {
+    assert.deepEqual(Rules.explain(SETTINGS, "mary@example.com"), {
       position: "above",
       source: "domain",
-      key: "@company.com",
+      key: "@example.com",
     });
-    assert.deepEqual(Rules.explain(SETTINGS, "unknown@elsewhere.net"), {
+    assert.deepEqual(Rules.explain(SETTINGS, "unknown@example.net"), {
       position: "none",
       source: "default",
       key: null,
@@ -82,8 +84,8 @@ describe("explanation", () => {
 describe("recipient", () => {
   test("a string is usable", () => {
     assert.equal(
-      Rules.usableAddress("John <john@company.com>"),
-      "John <john@company.com>",
+      Rules.usableAddress("John <john@example.com>"),
+      "John <john@example.com>",
     );
   });
 
@@ -96,28 +98,28 @@ describe("recipient", () => {
 
 describe("writing rules", () => {
   test("adds a contact rule and a domain rule", () => {
-    const added = Rules.withRule(SETTINGS, "New@Example.com", "above");
-    assert.equal(added.rules["new@example.com"], "above");
-    assert.equal(Rules.withRule(SETTINGS, "@example.com", "below").rules["@example.com"], "below");
+    const added = Rules.withRule(SETTINGS, "New@Example.org", "above");
+    assert.equal(added.rules["new@example.org"], "above");
+    assert.equal(Rules.withRule(SETTINGS, "@example.org", "below").rules["@example.org"], "below");
   });
 
   test("does not modify the settings it receives", () => {
     const before = JSON.stringify(SETTINGS);
-    Rules.withRule(SETTINGS, "other@example.com", "above");
-    Rules.withoutRule(SETTINGS, "john@company.com");
+    Rules.withRule(SETTINGS, "other@example.org", "above");
+    Rules.withoutRule(SETTINGS, "john@example.com");
     assert.equal(JSON.stringify(SETTINGS), before);
   });
 
   test("refuses an invalid key or position", () => {
     assert.throws(() => Rules.withRule(SETTINGS, "not-an-address", "above"));
-    assert.throws(() => Rules.withRule(SETTINGS, "john@company.com", "middle"));
-    assert.throws(() => Rules.withRule(SETTINGS, "john@company.com", "none"));
+    assert.throws(() => Rules.withRule(SETTINGS, "john@example.com", "middle"));
+    assert.throws(() => Rules.withRule(SETTINGS, "john@example.com", "none"));
   });
 
   test("removes a rule, including one written in another case", () => {
-    const without = Rules.withoutRule(SETTINGS, "JOHN@company.COM");
-    assert.equal("john@company.com" in without.rules, false);
-    assert.equal(Rules.resolve(without, "john@company.com"), "above");
+    const without = Rules.withoutRule(SETTINGS, "JOHN@example.COM");
+    assert.equal("john@example.com" in without.rules, false);
+    assert.equal(Rules.resolve(without, "john@example.com"), "above");
   });
 });
 

@@ -50,7 +50,7 @@
   "optionsColumnActions": { "message": "Actions" },
   "optionsAdd": { "message": "Add" },
   "optionsDelete": { "message": "Delete" },
-  "optionsNewPlaceholder": { "message": "john@company.com or @company.com" },
+  "optionsNewPlaceholder": { "message": "john@example.com or @example.com" },
   "optionsDefault": { "message": "When no rule matches" },
   "optionsSignature": { "message": "Signature" },
   "optionsSignatureIntro": {

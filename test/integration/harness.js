@@ -585,7 +585,7 @@ const checkInterfaces = async (ids, extensionId) => {
     );
 
     await browser.testkit.actOnPage("options/options.html", [
-      { selector: "#key", action: "type", value: "Added@From.Options" },
+      { selector: "#key", action: "type", value: "Added@Example.ORG" },
       { selector: "#position", action: "select", value: "below" },
       { selector: "#add", action: "submit" },
     ]);
@@ -594,7 +594,7 @@ const checkInterfaces = async (ids, extensionId) => {
     const afterAdd = await browser.testkit.getStorage(extensionId);
     note(
       "options-add-saved",
-      afterAdd?.settings?.rules?.["added@from.options"] === "below",
+      afterAdd?.settings?.rules?.["added@example.org"] === "below",
       afterAdd?.settings?.rules,
     );
 

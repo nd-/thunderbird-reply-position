@@ -14,8 +14,8 @@ Manifest V3, Thunderbird 140 ESR and later. MPL-2.0 licence.
 A rule maps an address or a domain to a position:
 
 ```
-john@company.com  → below the quote
-@company.com      → above the quote
+john@example.com  → below the quote
+@example.com      → above the quote
 ```
 
 When a reply opens, the **first address of the "To" field** decides. Resolution goes from the

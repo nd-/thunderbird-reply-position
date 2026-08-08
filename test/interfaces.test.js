@@ -269,7 +269,7 @@ describe("popup", () => {
 describe("options page", () => {
   const SETTINGS = {
     version: 1,
-    rules: { "john@company.com": "below", "@company.com": "above" },
+    rules: { "john@example.com": "below", "@example.com": "above" },
     defaultAction: "none",
     signature: "reply",
   };
@@ -281,7 +281,7 @@ describe("options page", () => {
     const keys = [...document.querySelectorAll("#rules tr td:first-child")].map(
       (td) => td.textContent,
     );
-    assert.deepEqual(keys, ["@company.com", "john@company.com"]);
+    assert.deepEqual(keys, ["@example.com", "john@example.com"]);
     assert.equal(document.querySelector("#empty").hidden, true);
     assert.equal(document.querySelector("#default").value, "none");
   });
@@ -301,7 +301,7 @@ describe("options page", () => {
     const { document } = await openOptions(browser);
 
     const rows = [...document.querySelectorAll("#rules tr")];
-    assert.equal(rows[0].querySelector("select").value, "above"); // @company.com
+    assert.equal(rows[0].querySelector("select").value, "above"); // @example.com
     assert.equal(rows[1].querySelector("select").value, "below"); // john@…
   });
 
@@ -350,8 +350,8 @@ describe("options page", () => {
     await flush();
 
     const forget = browser.calls.find((c) => c.message?.type === "forget");
-    assert.equal(forget.message.key, "@company.com");
-    assert.deepEqual(Object.keys(browser.settings.rules), ["john@company.com"]);
+    assert.equal(forget.message.key, "@example.com");
+    assert.deepEqual(Object.keys(browser.settings.rules), ["john@example.com"]);
   });
 
   test("changing a position from the table saves it again", async () => {
@@ -365,7 +365,7 @@ describe("options page", () => {
     await flush();
 
     const remember = browser.calls.find((c) => c.message?.type === "remember");
-    assert.equal(remember.message.key, "@company.com");
+    assert.equal(remember.message.key, "@example.com");
     assert.equal(remember.message.position, "below");
   });
 
