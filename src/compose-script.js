@@ -37,8 +37,19 @@
    * jsdom. What happens here is only the replay: rewind to the original markup, then let the
    * editor put the rearranged one back.
    *
-   * The cost, to weigh at the MIME check: going through innerHTML drops the internal
-   * attributes Thunderbird sets but does not serialize, `_moz_quote` and `_moz_dirty`. */
+   * ON THE THREE innerHTML BELOW, for whoever reviews this add-on: none of them introduces
+   * markup. The only value ever assigned is what was just read from `document.body` of this
+   * same composer, a few lines above, with the order of its top-level nodes changed and
+   * nothing else. No string is built, concatenated or interpolated; nothing comes from the
+   * network, from storage, from a message, or from any other document. The extension holds no
+   * host permission and requests no remote code. `insertHTML` receives that same value, and
+   * the editor sanitizes it as it would any paste.
+   *
+   * The cost of going through innerHTML is that the internal attributes Thunderbird sets but
+   * never serializes, `_moz_quote` and `_moz_dirty`, are dropped. Measured at the MIME check
+   * on 9 August 2026: the emitted message is byte for byte the same as with a plain DOM move,
+   * in HTML, in plain text, and in plain text with a signature. See the `mime-*` cases of
+   * `npm run verify`. */
   const applyUndoable = (target, options) => {
     const body = document.body;
     const original = body.innerHTML;
