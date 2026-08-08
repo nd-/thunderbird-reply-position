@@ -23,12 +23,55 @@
    * `Layout.analyze` and kept for the following switches. */
   const initialAnchor = Layout.analyze(document).signatureAnchor;
 
+  /* Rearranges, then replays the result through the editor so that Ctrl+Z undoes it.
+   *
+   * Nodes moved by plain DOM calls never reach the undo stack: the editor only knows the
+   * transactions it performed itself. Measured in TB 153 by test/integration/undo-probe.js —
+   * after typing, switching and undoing, the typed text was lost and the quote stayed where
+   * the switch had put it, which is what a user reported. Of the three ways measured, only
+   * one behaves: select everything and insert the rearranged body in a single command, which
+   * the editor records as one transaction. Deleting the quote then inserting it elsewhere
+   * makes two, and a single Ctrl+Z then leaves the message without its quote.
+   *
+   * `Layout.apply` still does the arranging on the real DOM, unchanged and testable under
+   * jsdom. What happens here is only the replay: rewind to the original markup, then let the
+   * editor put the rearranged one back.
+   *
+   * The cost, to weigh at the MIME check: going through innerHTML drops the internal
+   * attributes Thunderbird sets but does not serialize, `_moz_quote` and `_moz_dirty`. */
+  const applyUndoable = (target, options) => {
+    const body = document.body;
+    const original = body.innerHTML;
+
+    const result = Layout.apply(document, target, options);
+    if (!result.changed) {
+      return result;
+    }
+
+    const rearranged = body.innerHTML;
+    body.innerHTML = original;
+
+    const replayed =
+      typeof document.execCommand === "function" &&
+      document.execCommand("selectAll") &&
+      document.execCommand("insertHTML", false, rearranged);
+
+    if (!replayed) {
+      /* Editor refused: keep the rearrangement rather than the original, and lose only the
+       * ability to undo it. */
+      body.innerHTML = rearranged;
+    }
+    Layout.placeCursor(document, result.cursorIndex);
+
+    return { ...result, undoable: Boolean(replayed) };
+  };
+
   const applyPlan = async () => {
     const plan = await browser.runtime.sendMessage({ type: "plan" });
     if (!plan?.act) {
       return plan;
     }
-    const result = Layout.apply(document, plan.target, {
+    const result = applyUndoable(plan.target, {
       plainText: plan.plainText,
       anchor: initialAnchor,
       signature: plan.signature,
@@ -47,7 +90,7 @@
 
       case "place":
         return Promise.resolve(
-          Layout.apply(document, message.target, {
+          applyUndoable(message.target, {
             plainText: message.plainText,
             anchor: initialAnchor,
             signature: message.signature,

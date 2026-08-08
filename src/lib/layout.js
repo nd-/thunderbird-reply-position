@@ -270,6 +270,9 @@ var Layout = (() => {
       before: before.position,
       after: analyze(document).position,
       anchor: chosenAnchor,
+      /* Where the cursor belongs, so that a caller which replays the rearrangement through
+       * the editor can put it back without deciding anything itself. See compose-script.js. */
+      cursorIndex: index,
       reason: null,
     };
   };

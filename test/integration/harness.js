@@ -148,7 +148,8 @@ const MATRIX = [
    * serve to verify it: if they ever differ, some marker does exist. */
   {
     id: "reply-html-below-sig-bottom",
-    comment: "HTML reply below the quote, signature at the bottom of the message",
+    comment:
+      "HTML reply below the quote, signature at the bottom of the message",
     message: "html-clean.eml",
     action: "reply",
     prefs: {
@@ -160,7 +161,8 @@ const MATRIX = [
   },
   {
     id: "reply-html-below-sig-top",
-    comment: "HTML reply below the quote, signature attached to the writing area",
+    comment:
+      "HTML reply below the quote, signature attached to the writing area",
     message: "html-clean.eml",
     action: "reply",
     prefs: {
@@ -172,7 +174,8 @@ const MATRIX = [
   },
   {
     id: "reply-plaintext-below-sig-bottom",
-    comment: "Plain text reply below the quote, signature at the bottom of the message",
+    comment:
+      "Plain text reply below the quote, signature at the bottom of the message",
     message: "plaintext.eml",
     action: "reply",
     prefs: {
@@ -186,7 +189,8 @@ const MATRIX = [
   },
   {
     id: "reply-plaintext-below-sig-top",
-    comment: "Plain text reply below the quote, signature attached to the writing area",
+    comment:
+      "Plain text reply below the quote, signature attached to the writing area",
     message: "plaintext.eml",
     action: "reply",
     prefs: {
@@ -335,7 +339,9 @@ const observedPosition = (children) => {
   );
   if (quote === -1) return "no-quote";
 
-  const end = children[quote].includes("moz-forward-container") ? quote : quote + 1;
+  const end = children[quote].includes("moz-forward-container")
+    ? quote
+    : quote + 1;
   const meaningful = (list) => list.filter((e) => !e.includes("moz-signature"));
 
   if (meaningful(children.slice(0, quote)).length) return "above";
@@ -362,7 +368,8 @@ const outline = (children) =>
 
 const T0 = Date.now();
 const log = [];
-const trace = (event, data = {}) => log.push({ ms: Date.now() - T0, event, ...data });
+const trace = (event, data = {}) =>
+  log.push({ ms: Date.now() - T0, event, ...data });
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -371,7 +378,8 @@ const readFixture = async (name) => {
   return response.text();
 };
 
-const headerIdOf = (name) => `${name.replace(/\.eml$/, "")}@reply-position.invalid`;
+const headerIdOf = (name) =>
+  `${name.replace(/\.eml$/, "")}@reply-position.invalid`;
 
 /* Imports the .eml files and returns, per fixture name, the WebExtension id of the message.
  * Indexing is not instant after the import: the query is retried. */
@@ -386,7 +394,9 @@ const importMessages = async () => {
   for (const name of MESSAGES) {
     const headerMessageId = headerIdOf(name);
     for (let attempt = 1; attempt <= 25; attempt += 1) {
-      const { messages: found } = await browser.messages.query({ headerMessageId });
+      const { messages: found } = await browser.messages.query({
+        headerMessageId,
+      });
       if (found.length) {
         ids[name] = found[0].id;
         trace("message found", { name, id: found[0].id, attempt });
@@ -475,11 +485,21 @@ const runCheck = async (testCase, ids) => {
   const messageId = ids[testCase.message];
   /* A forward opens with no recipient; filling it in at opening time reproduces a forward
    * to a known contact, the only case where a rule can apply. */
-  const openDetails = testCase.recipients ? { to: testCase.recipients } : undefined;
+  const openDetails = testCase.recipients
+    ? { to: testCase.recipients }
+    : undefined;
   const tab =
     testCase.action === "forward"
-      ? await browser.compose.beginForward(messageId, "forwardInline", openDetails)
-      : await browser.compose.beginReply(messageId, "replyToSender", openDetails);
+      ? await browser.compose.beginForward(
+          messageId,
+          "forwardInline",
+          openDetails,
+        )
+      : await browser.compose.beginReply(
+          messageId,
+          "replyToSender",
+          openDetails,
+        );
   trace("composer opened", { case: testCase.id, tabId: tab.id });
 
   try {
@@ -493,7 +513,8 @@ const runCheck = async (testCase, ids) => {
       probe = await probeComposer(tab.id, details.isPlainText);
       observed = observedPosition(probe.delayed.children);
       shape = outline(probe.delayed.children);
-      const shapeOk = !testCase.expectedOutline || shape === testCase.expectedOutline;
+      const shapeOk =
+        !testCase.expectedOutline || shape === testCase.expectedOutline;
       if (observed === testCase.expected && shapeOk) {
         trace("position reached", { case: testCase.id, attempt });
         break;
@@ -506,7 +527,9 @@ const runCheck = async (testCase, ids) => {
       mismatches.push(`position ${observed}, expected ${testCase.expected}`);
     }
     if (testCase.expectedOutline && shape !== testCase.expectedOutline) {
-      mismatches.push(`body "${shape}", expected "${testCase.expectedOutline}"`);
+      mismatches.push(
+        `body "${shape}", expected "${testCase.expectedOutline}"`,
+      );
     }
 
     return {
@@ -519,7 +542,11 @@ const runCheck = async (testCase, ids) => {
       expectedOutline: testCase.expectedOutline,
       outline: shape,
       ok: mismatches.length === 0,
-      details: { type: details.type, isPlainText: details.isPlainText, to: details.to },
+      details: {
+        type: details.type,
+        isPlainText: details.isPlainText,
+        to: details.to,
+      },
       probe,
       error: mismatches.length ? mismatches.join(" ; ") : undefined,
     };
@@ -542,8 +569,14 @@ const checkInterfaces = async (ids, extensionId) => {
    * which no API available to an Experiment produces. What can be checked, then, is that
    * Thunderbird did create the button and its panel out of the manifest. The content of the
    * popup is covered under jsdom by test/interfaces.test.js. */
-  await browser.testkit.setPrefs({ ...NEUTRAL_PREFS, [`${ID}.reply_on_top`]: 1 });
-  const tab = await browser.compose.beginReply(ids["html-clean.eml"], "replyToSender");
+  await browser.testkit.setPrefs({
+    ...NEUTRAL_PREFS,
+    [`${ID}.reply_on_top`]: 1,
+  });
+  const tab = await browser.compose.beginReply(
+    ids["html-clean.eml"],
+    "replyToSender",
+  );
   await wait(1500);
 
   try {
@@ -574,7 +607,10 @@ const checkInterfaces = async (ids, extensionId) => {
    * underlying bug. */
   for (const dark of [false, true]) {
     await browser.testkit.setPrefs({ "ui.systemUsesDarkTheme": dark ? 1 : 0 });
-    const themedTab = await browser.compose.beginReply(ids["html-clean.eml"], "replyToSender");
+    const themedTab = await browser.compose.beginReply(
+      ids["html-clean.eml"],
+      "replyToSender",
+    );
     await wait(1500);
     try {
       const button = await browser.testkit.inspectComposeAction(extensionId);
@@ -586,14 +622,20 @@ const checkInterfaces = async (ids, extensionId) => {
         vars: button.iconVariables,
       });
       const expected = dark ? "compose-action-light.svg" : "compose-action.svg";
-      const unexpected = dark ? "compose-action.svg" : "compose-action-light.svg";
+      const unexpected = dark
+        ? "compose-action.svg"
+        : "compose-action-light.svg";
       note(
         dark ? "button-icon-dark-theme" : "button-icon-light-theme",
         button.icon.includes(expected) && !button.icon.includes(unexpected),
         button.icon,
       );
     } catch (e) {
-      note(dark ? "button-icon-dark-theme" : "button-icon-light-theme", false, e.message);
+      note(
+        dark ? "button-icon-dark-theme" : "button-icon-light-theme",
+        false,
+        e.message,
+      );
     } finally {
       await browser.tabs.remove(themedTab.id);
     }
@@ -602,7 +644,10 @@ const checkInterfaces = async (ids, extensionId) => {
 
   /* — Options page, in a tab — */
   try {
-    await browser.testkit.openExtensionPage(extensionId, "options/options.html");
+    await browser.testkit.openExtensionPage(
+      extensionId,
+      "options/options.html",
+    );
     await wait(2000);
 
     const read = await browser.testkit.readPage("options/options.html", [
@@ -614,10 +659,15 @@ const checkInterfaces = async (ids, extensionId) => {
     ]);
     trace("options read", { url: read.url, elements: read.elements });
 
-    note("options-title-translated", !read.elements.h1.text.startsWith("__MSG"), read.elements.h1.text);
+    note(
+      "options-title-translated",
+      !read.elements.h1.text.startsWith("__MSG"),
+      read.elements.h1.text,
+    );
     note(
       "options-rules-displayed",
-      read.elements["#rules tr"].exists && read.elements["#rules tr"].count >= 2,
+      read.elements["#rules tr"].exists &&
+        read.elements["#rules tr"].count >= 2,
       read.elements["#rules tr"].count,
     );
 
@@ -661,11 +711,72 @@ const checkInterfaces = async (ids, extensionId) => {
     note("options", false, e.message);
   }
 
+  /* — Ctrl+Z after a move —
+   *
+   * Reported from real use: typing, switching the position, then undoing loses the typed text
+   * and leaves the quote where the switch put it. undo-probe.js reproduces the mechanism on a
+   * composer of its own. */
+  for (const [flavour, message, html] of [
+    ["html", "html-clean.eml", true],
+    ["plaintext", "plaintext.eml", false],
+  ]) {
+    await browser.testkit.setPrefs({
+      ...NEUTRAL_PREFS,
+      [`${ID}.reply_on_top`]: 1,
+      [`${ID}.compose_html`]: html,
+    });
+    const undoTab = await browser.compose.beginReply(
+      ids[message],
+      "replyToSender",
+    );
+    await wait(1500);
+    try {
+      const [injection] = await browser.scripting.executeScript({
+        target: { tabId: undoTab.id },
+        files: ["undo-probe.js"],
+      });
+      const undo = injection?.result;
+      trace(`undo probe, ${flavour}`, undo);
+
+      note(
+        `undo-restores-a-replayed-move-${flavour}`,
+        Boolean(undo?.replay?.moved) &&
+          Boolean(undo?.replay?.undoUndidTheMove) &&
+          Boolean(undo?.replay?.undoKeptTheText),
+        `order back: ${undo?.replay?.undoUndidTheMove}, text kept: ${undo?.replay?.undoKeptTheText}`,
+      );
+      /* The witness: plain DOM calls stay outside the undo stack, which is the whole reason
+       * compose-script.js replays the rearrangement through the editor. */
+      note(
+        `undo-ignores-a-plain-dom-move-${flavour}`,
+        undo?.dom?.undoUndidTheMove === false &&
+          undo?.dom?.undoKeptTheText === false,
+        `order back: ${undo?.dom?.undoUndidTheMove}, text kept: ${undo?.dom?.undoKeptTheText}`,
+      );
+      /* Not a success, a measured fact held in place: replaying through the editor goes
+       * through innerHTML, which drops the internal attributes Thunderbird never serializes,
+       * `_moz_quote` above all. The editor puts some back, not all. Whether that changes the
+       * message actually sent is for the MIME check to say; until then this case will report
+       * any change in the loss. */
+      note(
+        `replay-loses-internal-attributes-${flavour}`,
+        undo?.internalsAfterReplay < undo?.internalsAtStart,
+        `${undo?.internalsAtStart} at open, ${undo?.internalsAfterReplay} after the replay`,
+      );
+    } catch (e) {
+      note(`undo-${flavour}`, false, e.message);
+    } finally {
+      await browser.tabs.remove(undoTab.id);
+    }
+  }
+
   return results;
 };
 
 const run = async () => {
-  const mode = (await browser.testkit.getPref("extensions.reply-position.mode")) ?? "capture";
+  const mode =
+    (await browser.testkit.getPref("extensions.reply-position.mode")) ??
+    "capture";
   const report = {
     date: new Date().toISOString(),
     mode,
@@ -700,7 +811,11 @@ const run = async () => {
         report.cases.push(await play(testCase, ids));
       } catch (e) {
         trace("case failed", { case: testCase.id, message: e.message });
-        report.cases.push({ id: testCase.id, comment: testCase.comment, error: e.message });
+        report.cases.push({
+          id: testCase.id,
+          comment: testCase.comment,
+          error: e.message,
+        });
       }
     }
 
