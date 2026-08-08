@@ -1,7 +1,7 @@
 # Reply position per recipient
 
 Thunderbird extension that places the writing area **above or below the quote depending on
-the recipient**, with a toggle button in the compose window.
+the recipient**, with a toggle button in the compose window that switches the position.
 
 Thunderbird only offers that setting globally, per identity
 (`mail.identity.idN.reply_on_top`). Yet some correspondents reply above the quote and others
@@ -71,3 +71,19 @@ document and rearranges it. Neither of them calls `browser.*`.
 
 Manual loading: *Add-ons → Debug → Load Temporary Add-on*, then `src/manifest.json`. Always in
 a dedicated profile: the extension rewrites the body of the messages being composed.
+
+## Licence
+
+[MPL-2.0](LICENSE). Every file under `src/` carries the header, and a copy of the licence
+ships inside the extension itself (`src/LICENSE`).
+
+The published add-on embeds **no third-party code**. Every file under `src/` is original;
+nothing is bundled, minified or loaded from a remote host, as the ATN review requires.
+
+The development toolchain has two dependencies, both permissive: **jsdom** (MIT) for the unit
+tests, **web-ext** (MPL-2.0) to load the extension into Thunderbird. Their transitive tree
+(369 packages) is MIT, ISC, BSD, Apache-2.0 or MPL-2.0 throughout, with no copyleft-only and
+no unlicensed package. None of it ships with the add-on.
+
+The capture harness downloads Mozilla's en-US language pack (MPL-2.0, signed by Mozilla) into
+the gitignored `.tmp/`. It is neither committed nor redistributed.
