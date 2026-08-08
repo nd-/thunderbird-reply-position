@@ -129,7 +129,42 @@ const injectIntoOpenComposers = async () => {
   }
 };
 
+/* The toolbar icon has to be chosen here, because Thunderbird chooses it wrong.
+ *
+ * `theme_icons` is the documented mechanism, and it does not work with the built-in themes,
+ * "automatic" included, which is what most people run. Measured in TB 153, and kept under
+ * watch by the `button-icon-*-theme` cases of the verification harness:
+ *
+ *  - `ExtensionParent.sys.mjs` overwrites the `default_icon` entry with the `dark` file of
+ *    `theme_icons` (`default: lightURL`, flagged in the source as bug 2008737);
+ *  - `webextensions.css` only reaches for the other file under `:root[lwtheme]`, an attribute
+ *    the built-in themes do not set: with the default theme the root carries
+ *    `theme-effective-id=default-theme@mozilla.org` and nothing else.
+ *
+ * So whatever the two keys hold, the same file comes out on a light and on a dark toolbar.
+ * `context-fill` is no way out either: the computed style of the button has a `fill` that does
+ * follow the theme, but an empty `-moz-context-properties`, so nothing is passed to the image.
+ *
+ * What is left is picking the file ourselves. The background page is an extension document,
+ * so `matchMedia` answers there without any extra permission. */
+const ICONS = {
+  light: "icons/compose-action.svg",
+  dark: "icons/compose-action-light.svg",
+};
+
+const applyThemedIcon = (dark) => {
+  const path = dark ? ICONS.dark : ICONS.light;
+  return browser.composeAction.setIcon({ path: { 16: path, 32: path } });
+};
+
+const watchTheme = () => {
+  const dark = matchMedia("(prefers-color-scheme: dark)");
+  dark.addEventListener("change", (event) => applyThemedIcon(event.matches));
+  return applyThemedIcon(dark.matches);
+};
+
 const start = async () => {
+  await watchTheme();
   try {
     await browser.scripting.compose.registerScripts([
       {

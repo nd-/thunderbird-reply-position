@@ -563,6 +563,43 @@ const checkInterfaces = async (ids, extensionId) => {
     await browser.tabs.remove(tab.id);
   }
 
+  /* — The icon follows the theme —
+   *
+   * `ui.systemUsesDarkTheme` is what the desktop environment would set, and it drives
+   * `prefers-color-scheme` both in the chrome and in the background page of the extension.
+   *
+   * This is not a formality: `theme_icons` never worked here, and background.js picks the file
+   * by hand because of it (the reason is written down there). These two cases are what keeps
+   * that workaround honest, and what will say whether a later Thunderbird fixes the
+   * underlying bug. */
+  for (const dark of [false, true]) {
+    await browser.testkit.setPrefs({ "ui.systemUsesDarkTheme": dark ? 1 : 0 });
+    const themedTab = await browser.compose.beginReply(ids["html-clean.eml"], "replyToSender");
+    await wait(1500);
+    try {
+      const button = await browser.testkit.inspectComposeAction(extensionId);
+      trace(`compose button, dark=${dark}`, {
+        icon: button.icon,
+        prefersDark: button.prefersDark,
+        root: button.rootAttributes,
+        contextFill: button.contextFill,
+        vars: button.iconVariables,
+      });
+      const expected = dark ? "compose-action-light.svg" : "compose-action.svg";
+      const unexpected = dark ? "compose-action.svg" : "compose-action-light.svg";
+      note(
+        dark ? "button-icon-dark-theme" : "button-icon-light-theme",
+        button.icon.includes(expected) && !button.icon.includes(unexpected),
+        button.icon,
+      );
+    } catch (e) {
+      note(dark ? "button-icon-dark-theme" : "button-icon-light-theme", false, e.message);
+    } finally {
+      await browser.tabs.remove(themedTab.id);
+    }
+  }
+  await browser.testkit.setPrefs({ "ui.systemUsesDarkTheme": 0 });
+
   /* — Options page, in a tab — */
   try {
     await browser.testkit.openExtensionPage(extensionId, "options/options.html");

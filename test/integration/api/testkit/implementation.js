@@ -228,10 +228,41 @@ var testkit = class extends ExtensionCommon.ExtensionAPI {
             throw new ExtensionError(`No button found for ${prefix}. Candidates: ${ids || "none"}`);
           }
           const rect = button.getBoundingClientRect();
+          const style = window.getComputedStyle(button);
           return {
             button: button.id,
             visible: rect.width > 0 && rect.height > 0,
             label: button.getAttribute("label") ?? button.getAttribute("tooltiptext"),
+            /* Which icon file Thunderbird actually resolved, and the three variables it picks
+             * from. That is the only way to tell what `theme_icons` really does: the two names
+             * are swapped once in ExtensionParent and used swapped again in the stylesheet. */
+            icon: style.listStyleImage,
+            /* Which branch of webextensions.css is live: the media query, or the `lwtheme`
+             * attribute a built-in theme puts on the root. */
+            prefersDark: window.matchMedia("(prefers-color-scheme: dark)").matches,
+            rootAttributes: [...window.document.documentElement.attributes]
+              .map((a) => (a.value ? `${a.name}=${a.value}` : a.name))
+              .join(" "),
+            /* Is `context-fill` fed here? If the button, or the image inside it, carries
+             * -moz-context-properties with a fill, one monochrome file would follow the theme
+             * on its own and theme_icons would be pointless. */
+            contextFill: (() => {
+              const inner = button.querySelector(".toolbarbutton-icon") ?? button;
+              const innerStyle = window.getComputedStyle(inner);
+              return {
+                buttonProperties: style.getPropertyValue("-moz-context-properties"),
+                buttonFill: style.getPropertyValue("fill"),
+                buttonColor: style.getPropertyValue("color"),
+                iconProperties: innerStyle.getPropertyValue("-moz-context-properties"),
+                iconFill: innerStyle.getPropertyValue("fill"),
+                iconColor: innerStyle.getPropertyValue("color"),
+              };
+            })(),
+            iconVariables: {
+              default: style.getPropertyValue("--webextension-toolbar-image").trim(),
+              light: style.getPropertyValue("--webextension-toolbar-image-light").trim(),
+              dark: style.getPropertyValue("--webextension-toolbar-image-dark").trim(),
+            },
           };
         },
 
