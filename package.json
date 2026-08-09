@@ -1,10 +1,12 @@
 {
   "name": "reply-position",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "scripts": {
+    "build": "web-ext build -s src -a web-ext-artifacts --overwrite-dest --filename \"reply-position-{version}.xpi\"",
     "capture": "node tools/run-integration.mjs",
-    "profile": "node tools/make-profile.mjs",
     "fixtures": "node tools/extract-fixtures.mjs",
+    "lint": "web-ext lint -s src",
+    "profile": "node tools/make-profile.mjs",
     "test": "node --test test/*.test.js",
     "verify": "node tools/run-integration.mjs --verify"
   },

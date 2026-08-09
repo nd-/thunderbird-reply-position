@@ -2,13 +2,15 @@
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "Nicolas Dorigny",
+  "homepage_url": "https://github.com/nd-/thunderbird-reply-position",
   "default_locale": "en",
   "browser_specific_settings": {
     "gecko": {
       "id": "reply-position@dataetic.fr",
-      "strict_min_version": "140.0"
+      "strict_min_version": "140.0",
+      "data_collection_permissions": { "required": ["none"] }
     }
   },
   "permissions": ["compose", "scripting", "storage"],

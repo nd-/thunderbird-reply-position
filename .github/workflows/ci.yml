@@ -1,0 +1,50 @@
+# Unit tests and linting on every push, plus the XPI on a version tag.
+#
+# `npm run capture` and `npm run verify` are deliberately absent: they start a real Thunderbird
+# from /opt/thunderbird, which no runner has. They stay a local step, to be run before tagging.
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      # Exits 0 on warnings, and the eight it reports are known false positives on
+      # Thunderbird, listed in PUBLISHING.md. Only an error fails this step.
+      - run: npm run lint
+
+  release:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # An archive of what was sent to addons.thunderbird.net, not a distribution channel:
+      # this XPI is unsigned and will not install in Thunderbird as it is.
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: web-ext-artifacts/*.xpi
+          body: |
+            Unsigned build, kept as a record of the version submitted to
+            addons.thunderbird.net. Install the add-on from there, not from here.
