@@ -14,16 +14,16 @@
   "positionAbove": { "message": "Above the quote" },
   "positionBelow": { "message": "Below the quote" },
   "positionNone": { "message": "Leave unchanged" },
-  "positionUnknown": { "message": "Undetermined" },
 
-  "popupCurrent": { "message": "Current position" },
-  "popupToggle": { "message": "Switch" },
+  "popupWhere": { "message": "Where to write this reply" },
+  "popupScope": { "message": "Only changes this window." },
+  "popupRememberLegend": { "message": "Remember this choice" },
   "popupRememberContact": {
-    "message": "Remember for $ADDRESS$",
+    "message": "for $ADDRESS$",
     "placeholders": { "address": { "content": "$1", "example": "alex@example.com" } }
   },
   "popupRememberDomain": {
-    "message": "Remember for all of $DOMAIN$",
+    "message": "for all of $DOMAIN$",
     "placeholders": { "domain": { "content": "$1", "example": "@example.com" } }
   },
   "popupNoRecipient": {
@@ -38,6 +38,8 @@
   "popupRuleContact": { "message": "Rule for this contact" },
   "popupRuleDomain": { "message": "Rule for this domain" },
   "popupRuleDefault": { "message": "Default position" },
+  "popupRuleOverridden": { "message": "Chosen in this window" },
+  "popupRuleUntouched": { "message": "Thunderbird's own position" },
   "popupOptions": { "message": "Manage rules" },
   "popupSaved": { "message": "Rule saved" },
 

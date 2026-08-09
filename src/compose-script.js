@@ -21,7 +21,15 @@
    * node order no longer says whether the signature belongs to the reply text or to the
    * bottom of the message. This is not a decision, it is an observation made by
    * `Layout.analyze` and kept for the following switches. */
-  const initialAnchor = Layout.analyze(document).signatureAnchor;
+  const initial = Layout.analyze(document);
+  const initialAnchor = initial.signatureAnchor;
+
+  /* Where the body stands once the extension has had its say: Thunderbird's own layout when
+   * no rule applies, the position of the rule otherwise. Only `applyPlan` updates it, never a
+   * switch coming from the panel — that is the whole point. The popup compares the current
+   * position to it to tell a choice made by hand from a layout nobody touched; it cannot keep
+   * that itself, being destroyed every time it closes. */
+  let settledPosition = initial.position;
 
   /* Rearranges, then replays the result through the editor so that Ctrl+Z undoes it.
    *
@@ -87,6 +95,7 @@
       anchor: initialAnchor,
       signature: plan.signature,
     });
+    settledPosition = result.after;
     return { ...plan, result };
   };
 
@@ -94,9 +103,11 @@
     switch (message?.type) {
       case "state":
         /* The popup needs the real position, the one of the DOM: it can differ from the
-         * rule if the user has already switched by hand. */
+         * rule if the user has already switched by hand. `settled` is what lets it say so
+         * even after having been closed and reopened. */
         return Promise.resolve({
           position: Layout.analyze(document).position,
+          settled: settledPosition,
         });
 
       case "place":

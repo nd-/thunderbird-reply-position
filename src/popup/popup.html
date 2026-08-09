@@ -11,14 +11,25 @@
     <p id="unavailable" class="unavailable" hidden></p>
 
     <div id="panel" hidden>
-      <p class="state">
-        <span data-i18n="popupCurrent"></span>
-        <strong id="position"></strong>
-      </p>
+      <fieldset id="choice">
+        <legend data-i18n="popupWhere"></legend>
+        <label>
+          <input type="radio" name="position" value="above" id="position-above" />
+          <span data-i18n="positionAbove"></span>
+        </label>
+        <label>
+          <input type="radio" name="position" value="below" id="position-below" />
+          <span data-i18n="positionBelow"></span>
+        </label>
+      </fieldset>
 
-      <button id="toggle" type="button" data-i18n="popupToggle"></button>
+      <!-- Outside the fieldset and flush with the legend: indented under the last radio, the
+         - origin reads as a caption of that one option instead of a note on the whole group. -->
+      <p id="source" class="note"></p>
+      <p class="note" data-i18n="popupScope"></p>
 
       <fieldset id="remember">
+        <legend data-i18n="popupRememberLegend"></legend>
         <label>
           <input type="checkbox" id="remember-contact" />
           <span id="label-contact"></span>
@@ -34,6 +45,7 @@
 
     <button id="options" type="button" class="link" data-i18n="popupOptions"></button>
 
+    <script src="../lib/rules.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

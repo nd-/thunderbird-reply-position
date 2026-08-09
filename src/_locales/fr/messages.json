@@ -14,16 +14,16 @@
   "positionAbove": { "message": "Au-dessus de la citation" },
   "positionBelow": { "message": "Sous la citation" },
   "positionNone": { "message": "Ne rien changer" },
-  "positionUnknown": { "message": "Indéterminée" },
 
-  "popupCurrent": { "message": "Position actuelle" },
-  "popupToggle": { "message": "Basculer" },
+  "popupWhere": { "message": "Où écrire cette réponse" },
+  "popupScope": { "message": "Ne change que cette fenêtre." },
+  "popupRememberLegend": { "message": "Retenir ce choix" },
   "popupRememberContact": {
-    "message": "Retenir pour $ADRESSE$",
+    "message": "pour $ADRESSE$",
     "placeholders": { "adresse": { "content": "$1", "example": "camille@example.com" } }
   },
   "popupRememberDomain": {
-    "message": "Retenir pour tout $DOMAINE$",
+    "message": "pour tout $DOMAINE$",
     "placeholders": { "domaine": { "content": "$1", "example": "@example.com" } }
   },
   "popupNoRecipient": {
@@ -38,6 +38,8 @@
   "popupRuleContact": { "message": "Règle pour ce contact" },
   "popupRuleDomain": { "message": "Règle pour ce domaine" },
   "popupRuleDefault": { "message": "Position par défaut" },
+  "popupRuleOverridden": { "message": "Choisi dans cette fenêtre" },
+  "popupRuleUntouched": { "message": "Position d'origine de Thunderbird" },
   "popupOptions": { "message": "Gérer les règles" },
   "popupSaved": { "message": "Règle enregistrée" },
 

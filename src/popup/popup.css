@@ -14,11 +14,6 @@ p {
   margin: 0 0 0.6rem;
 }
 
-.state strong {
-  display: block;
-  margin-top: 0.15rem;
-}
-
 .unavailable {
   margin: 0;
   color: FieldText;
@@ -29,17 +24,23 @@ button {
   font: inherit;
 }
 
-#toggle {
-  width: 100%;
-  padding: 0.4rem;
-  margin-bottom: 0.7rem;
-}
-
 fieldset {
   border: none;
-  border-top: 1px solid ThreeDShadow;
   margin: 0;
-  padding: 0.6rem 0 0;
+  padding: 0;
+}
+
+legend {
+  padding: 0;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+
+/* Separates the choice from what makes it last. */
+#remember {
+  border-top: 1px solid ThreeDShadow;
+  margin-top: 0.7rem;
+  padding-top: 0.6rem;
 }
 
 fieldset label {
@@ -51,6 +52,18 @@ fieldset label {
 
 fieldset label:last-child {
   margin-bottom: 0;
+}
+
+/* Flush with the legend, never indented like the radio labels: these two lines comment on the
+ * group, and an indented one under the last radio would pass for a caption of that option. */
+.note {
+  margin: 0 0 0.2rem;
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+#source {
+  margin-top: 0.7rem;
 }
 
 .confirmation {

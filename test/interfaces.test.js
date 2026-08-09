@@ -19,7 +19,7 @@ import messagesFr from "../src/_locales/fr/messages.json" with { type: "json" };
 
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 
-/* Returns the key as is: a label displayed as "[popupToggle]" tells at once which string is
+/* Returns the key as is: a label displayed as "[popupWhere]" tells at once which string is
  * being used, and a key missing from the language file is detected. */
 const fakeI18n = () => ({
   getMessage: (key, arguments_ = []) => {
@@ -31,10 +31,14 @@ const fakeI18n = () => ({
   },
 });
 
-const fakeBrowser = ({ plan, state = { position: "above" }, settings } = {}) => {
+/* `settled` is what the compose script kept: the position the body had once the extension had
+ * had its say. It does not follow the switches coming from the panel, which is what lets the
+ * popup tell a hand move from an untouched layout after having been closed and reopened. */
+const fakeBrowser = ({ plan, state = { position: "above" }, settled, settings } = {}) => {
   const calls = [];
   const record = (name, payload) => calls.push({ name, ...payload });
 
+  const settledPosition = settled ?? state.position;
   let currentState = { ...state };
   let currentSettings = settings;
 
@@ -48,7 +52,9 @@ const fakeBrowser = ({ plan, state = { position: "above" }, settings } = {}) => 
       query: async () => [{ id: 42 }],
       sendMessage: async (tabId, message) => {
         record("tabs.sendMessage", { tabId, message });
-        if (message.type === "state") return { ...currentState };
+        if (message.type === "state") {
+          return { ...currentState, settled: settledPosition };
+        }
         if (message.type === "place") {
           currentState = { position: message.target };
           return { changed: true, before: state.position, after: message.target };
@@ -102,10 +108,24 @@ const FULL_PLAN = {
 };
 
 const openPopup = async (browser) => {
-  const page = await loadPage("popup/popup.html", ["popup/popup.js"], browser);
+  const page = await loadPage(
+    "popup/popup.html",
+    ["lib/rules.js", "popup/popup.js"],
+    browser,
+  );
   await flush();
   await flush();
   return page;
+};
+
+/* Ticking a radio by hand does not fire `change` in jsdom, as it would not in a browser: only
+ * a real click does. The listener under test is on `change`, so it is dispatched here. */
+const choose = async (document, id) => {
+  const radio = document.querySelector(id);
+  radio.checked = true;
+  radio.dispatchEvent(new document.defaultView.Event("change"));
+  await flush();
+  await flush();
 };
 
 const openOptions = async (browser) => {
@@ -150,7 +170,68 @@ describe("popup", () => {
     const { document } = await openPopup(browser);
 
     assert.equal(document.querySelector("#panel").hidden, false);
-    assert.equal(document.querySelector("#position").textContent, "[positionAbove]");
+    assert.equal(document.querySelector("#position-above").checked, true);
+    assert.equal(document.querySelector("#position-below").checked, false);
+  });
+
+  test("a composer with no writing area checks neither of the two", async () => {
+    /* reply_on_top=2: the quote is selected and there is no writing paragraph at all. Nothing
+     * to preselect, the user picks. */
+    const browser = fakeBrowser({ plan: FULL_PLAN, state: { position: "absent" } });
+    const { document } = await openPopup(browser);
+
+    assert.equal(document.querySelector("#position-above").checked, false);
+    assert.equal(document.querySelector("#position-below").checked, false);
+  });
+
+  test("names where the displayed position comes from", async () => {
+    const browser = fakeBrowser({ plan: FULL_PLAN, state: { position: "below" } });
+    const { document } = await openPopup(browser);
+
+    assert.equal(document.querySelector("#source").textContent, "[popupRuleContact]");
+
+    await choose(document, "#position-above");
+    assert.equal(document.querySelector("#source").textContent, "[popupRuleOverridden]");
+  });
+
+  test("with no rule, the position is credited to Thunderbird until the user moves it", async () => {
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, act: false, target: "none", source: "default" },
+      state: { position: "above" },
+    });
+    const { document } = await openPopup(browser);
+
+    assert.equal(document.querySelector("#source").textContent, "[popupRuleUntouched]");
+
+    await choose(document, "#position-below");
+    assert.equal(document.querySelector("#source").textContent, "[popupRuleOverridden]");
+  });
+
+  test("a hand move survives the panel being closed and reopened", async () => {
+    /* The panel is destroyed every time it closes: the memory is in the compose script, which
+     * keeps the position the extension left the body at. Reported from use on 9 August 2026 —
+     * a flag held in the popup read "Thunderbird's own position" on the second opening. */
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, act: false, target: "none", source: "default" },
+      state: { position: "below" },
+      settled: "above",
+    });
+    const { document } = await openPopup(browser);
+
+    assert.equal(document.querySelector("#position-below").checked, true);
+    assert.equal(document.querySelector("#source").textContent, "[popupRuleOverridden]");
+  });
+
+  test("putting the body back where the extension left it clears the mention", async () => {
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, act: false, target: "none", source: "default" },
+      state: { position: "below" },
+      settled: "above",
+    });
+    const { document } = await openPopup(browser);
+
+    await choose(document, "#position-above");
+    assert.equal(document.querySelector("#source").textContent, "[popupRuleUntouched]");
   });
 
   test("names the contact and the domain in the checkboxes", async () => {
@@ -167,13 +248,11 @@ describe("popup", () => {
     );
   });
 
-  test('the switch sends "place" to the composer and updates the display', async () => {
+  test('choosing the other position sends "place" and updates the display', async () => {
     const browser = fakeBrowser({ plan: FULL_PLAN, state: { position: "above" } });
     const { document } = await openPopup(browser);
 
-    document.querySelector("#toggle").click();
-    await flush();
-    await flush();
+    await choose(document, "#position-below");
 
     const place = browser.calls.find((c) => c.message?.type === "place");
     assert.ok(place, 'no "place" message sent');
@@ -182,7 +261,24 @@ describe("popup", () => {
     assert.equal(place.message.plainText, false);
     /* Without it, the composer would fall back on its own default instead of the setting. */
     assert.equal(place.message.signature, "reply");
-    assert.equal(document.querySelector("#position").textContent, "[positionBelow]");
+    assert.equal(document.querySelector("#position-below").checked, true);
+  });
+
+  test("the composer has the last word on which radio ends up checked", async () => {
+    /* No quote to move: `place` answers with the position unchanged, and the radio the user
+     * just ticked has to come back to what the body really shows. */
+    const browser = fakeBrowser({ plan: FULL_PLAN, state: { position: "above" } });
+    browser.tabs.sendMessage = async (tabId, message) => {
+      browser.calls.push({ name: "tabs.sendMessage", tabId, message });
+      if (message.type === "state") return { position: "above", settled: "above" };
+      return { changed: false, before: "above", after: "above", reason: "no-quote" };
+    };
+    const { document } = await openPopup(browser);
+
+    await choose(document, "#position-below");
+
+    assert.equal(document.querySelector("#position-above").checked, true);
+    assert.equal(document.querySelector("#position-below").checked, false);
   });
 
   test('ticking "remember for the contact" saves the displayed position', async () => {
@@ -215,9 +311,7 @@ describe("popup", () => {
     const { document } = await openPopup(browser);
 
     document.querySelector("#remember-domain").checked = true;
-    document.querySelector("#toggle").click();
-    await flush();
-    await flush();
+    await choose(document, "#position-below");
 
     const remember = browser.calls.filter((c) => c.message?.type === "remember").pop();
     assert.equal(remember.message.key, "@sender.invalid");
