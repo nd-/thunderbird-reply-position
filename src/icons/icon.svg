@@ -1,3 +1,6 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     License, v. 2.0. If a copy of the MPL was not distributed with this
+     file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
 <svg width="128" height="128" version="1.1" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
 	<!-- Add-on icon: add-ons manager and addons.thunderbird.net listing. This is the reference
 		drawing; compose-action.svg and compose-action-light.svg redraw it on the 16 unit grid for
