@@ -83,6 +83,12 @@ document and rearranges it. Neither of them calls `browser.*`.
 Manual loading: *Add-ons → Debug → Load Temporary Add-on*, then `src/manifest.json`. Always in
 a dedicated profile: the extension rewrites the body of the messages being composed.
 
+What no harness can check — the visual rendering, a real send, closing a composer without
+typing, and the listing screenshots — needs a session set up by hand.
+[test/manual/README.md](test/manual/README.md) builds that session in five steps, with an
+English interface and an account that cannot reach anything, so that nothing real can end up
+in a published image.
+
 ## Licence
 
 [MPL-2.0](LICENSE). Every file under `src/` carries the header, the three JSON files excepted

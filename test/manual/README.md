@@ -85,7 +85,7 @@ user_pref("mail.server.serverN.download_on_biff", false);
 user_pref("mail.server.serverN.directory-rel", "[ProfD]Mail/pop.example.invalid");
 
 user_pref("mail.identity.idN.useremail", "nico@example.com");
-user_pref("mail.identity.idN.fullName", "Nico Dorigny");
+user_pref("mail.identity.idN.fullName", "Nico");
 user_pref("mail.identity.idN.valid", true);
 user_pref("mail.identity.idN.smtpServer", "smtpN");
 user_pref("mail.identity.idN.compose_html", true);
@@ -129,7 +129,7 @@ From - Sat Aug 08 18:07:00 2026
 Message-ID: <b41c7e20-5f8a-4d31-9a6e-7c2f0d5e1a83@example.com>
 Date: Sat, 8 Aug 2026 18:07:00 +0000
 From: Alex Martin <alex@example.com>
-To: Nico Dorigny <nico@example.com>
+To: Nico <nico@example.com>
 Subject: Draft agenda for Thursday
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
