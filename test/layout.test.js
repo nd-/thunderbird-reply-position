@@ -213,6 +213,31 @@ describe("signature", () => {
     assert.match(swapped, /^prefix · plain-quote/);
     assert.match(outline(top.document), /signature · prefix · plain-quote/);
   });
+
+  /* Switching twice in a row is what a user does with the toolbar button, and the anchor is
+   * the same object every time. One round trip already restored the order; what these check
+   * is that a second one changes nothing more — no signature drifting, and in plain text no
+   * blank line piling up cycle after cycle. That accumulation is the plausible failure here,
+   * `apply` moving the quote block through a run of bare `<br>` whose bounds are not certain. */
+  for (const [name, fixture, plainText] of [
+    ["HTML", "reply-html-sig-top.html", false],
+    ["plain text", "reply-plaintext-sig-top.html", true],
+  ]) {
+    test(`two round trips leave the body exactly where one did, in ${name}`, async () => {
+      const { Layout, document, anchor } = await anchorOf(fixture);
+      const options = { plainText, anchor };
+
+      Layout.apply(document, "below", options);
+      const afterFirstSwap = outline(document);
+      Layout.apply(document, "above", options);
+      const afterFirstTrip = outline(document);
+
+      Layout.apply(document, "below", options);
+      assert.equal(outline(document), afterFirstSwap, "second swap differs from the first");
+      Layout.apply(document, "above", options);
+      assert.equal(outline(document), afterFirstTrip, "second round trip drifted");
+    });
+  }
 });
 
 describe("signature whose anchor was never observable", () => {
