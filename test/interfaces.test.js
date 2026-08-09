@@ -103,6 +103,8 @@ const FULL_PLAN = {
   source: "contact",
   address: "camille@sender.invalid",
   domain: "@sender.invalid",
+  /* What the storage holds for those two keys: the popup ticks its boxes with it. */
+  rules: { contact: null, domain: null },
   plainText: false,
   signature: "reply",
 };
@@ -346,6 +348,111 @@ describe("popup", () => {
     const { document } = await openPopup(browser);
 
     assert.equal(document.querySelector("#unavailable").textContent, "[popupNoRecipient]");
+  });
+
+  test("the boxes open ticked when the rules already exist", async () => {
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, rules: { contact: "below", domain: "above" } },
+      state: { position: "below" },
+    });
+    const { document } = await openPopup(browser);
+
+    assert.equal(document.querySelector("#remember-contact").checked, true);
+    assert.equal(document.querySelector("#remember-domain").checked, true);
+    /* Both filed: the contact has its own rule, it inherits nothing. */
+    assert.equal(document.querySelector("#inherited").hidden, true);
+  });
+
+  test("a contact covered by its domain alone is told so", async () => {
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, source: "domain", rules: { contact: null, domain: "below" } },
+      state: { position: "below" },
+    });
+    const { document } = await openPopup(browser);
+
+    assert.equal(document.querySelector("#remember-contact").checked, false);
+    assert.equal(document.querySelector("#remember-domain").checked, true);
+    assert.equal(document.querySelector("#inherited").hidden, false);
+  });
+
+  test("giving the contact its own rule ends the inheritance", async () => {
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, source: "domain", rules: { contact: null, domain: "below" } },
+      state: { position: "below" },
+      settings: { version: 1, rules: { "@sender.invalid": "below" }, defaultAction: "none" },
+    });
+    const { document } = await openPopup(browser);
+
+    const contact = document.querySelector("#remember-contact");
+    contact.checked = true;
+    contact.dispatchEvent(new document.defaultView.Event("change"));
+    await flush();
+    await flush();
+
+    const remember = browser.calls.find((c) => c.message?.type === "remember");
+    assert.equal(remember.message.key, "camille@sender.invalid");
+    assert.equal(document.querySelector("#inherited").hidden, true);
+  });
+
+  test("unticking a box deletes the rule", async () => {
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, rules: { contact: "below", domain: null } },
+      state: { position: "below" },
+      settings: {
+        version: 1,
+        rules: { "camille@sender.invalid": "below" },
+        defaultAction: "none",
+      },
+    });
+    const { document } = await openPopup(browser);
+
+    const contact = document.querySelector("#remember-contact");
+    contact.checked = false;
+    contact.dispatchEvent(new document.defaultView.Event("change"));
+    await flush();
+    await flush();
+
+    const forget = browser.calls.find((c) => c.message?.type === "forget");
+    assert.ok(forget, 'no "forget" message sent');
+    assert.equal(forget.message.key, "camille@sender.invalid");
+    assert.deepEqual(Object.keys(browser.settings.rules), []);
+    assert.equal(document.querySelector("#confirmation").hidden, false);
+    assert.equal(document.querySelector("#confirmation").textContent, "[popupForgotten]");
+  });
+
+  test("a box left as it was writes nothing on a switch", async () => {
+    /* Only the differences go to the storage: switching with an untouched box costs nothing. */
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, rules: { contact: null, domain: null } },
+      state: { position: "above" },
+    });
+    const { document } = await openPopup(browser);
+
+    await choose(document, "#position-below");
+
+    assert.equal(
+      browser.calls.some((c) => ["remember", "forget"].includes(c.message?.type)),
+      false,
+    );
+  });
+
+  test("a ticked box follows the position on a switch", async () => {
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, rules: { contact: "above", domain: null } },
+      state: { position: "above" },
+      settings: {
+        version: 1,
+        rules: { "camille@sender.invalid": "above" },
+        defaultAction: "none",
+      },
+    });
+    const { document } = await openPopup(browser);
+
+    await choose(document, "#position-below");
+
+    const remember = browser.calls.filter((c) => c.message?.type === "remember").pop();
+    assert.equal(remember.message.key, "camille@sender.invalid");
+    assert.equal(remember.message.position, "below");
   });
 
   test("the link opens the options page", async () => {

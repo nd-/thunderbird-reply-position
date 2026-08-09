@@ -16,7 +16,6 @@
   "positionNone": { "message": "Ne rien changer" },
 
   "popupWhere": { "message": "Où écrire cette réponse" },
-  "popupScope": { "message": "Ne change que cette fenêtre." },
   "popupRememberLegend": { "message": "Retenir ce choix" },
   "popupRememberContact": {
     "message": "pour $ADRESSE$",
@@ -40,8 +39,10 @@
   "popupRuleDefault": { "message": "Position par défaut" },
   "popupRuleOverridden": { "message": "Choisi dans cette fenêtre" },
   "popupRuleUntouched": { "message": "Position d'origine de Thunderbird" },
+  "popupInheritsDomain": { "message": "Ce contact suit la règle de son domaine." },
   "popupOptions": { "message": "Gérer les règles" },
   "popupSaved": { "message": "Règle enregistrée" },
+  "popupForgotten": { "message": "Règle supprimée" },
 
   "optionsTitle": { "message": "Règles de position" },
   "optionsIntro": {

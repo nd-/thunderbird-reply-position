@@ -58,6 +58,23 @@ const start = async () => {
 
   const radios = [...document.querySelectorAll('input[name="position"]')];
 
+  /* A box is ticked when a rule exists for its key, and unticking it deletes that rule: the
+   * boxes are the state of the two rules, not a one-way "save now". `stored` holds what the
+   * storage carries as far as this panel knows, seeded from the plan and kept in step with
+   * what gets written, so that a box already ticked on opening is told from one the user has
+   * just ticked and nothing needless is written. */
+  const stored = {
+    contact: plan.rules?.contact ?? null,
+    domain: plan.rules?.domain ?? null,
+  };
+  const targets = [
+    { box: "#remember-contact", key: plan.address, slot: "contact" },
+    { box: "#remember-domain", key: plan.domain, slot: "domain" },
+  ];
+  for (const { box, slot } of targets) {
+    $(box).checked = stored[slot] !== null;
+  }
+
   /* Nothing about the choice is remembered here: this document is created and destroyed on
    * every opening of the panel. `state.settled`, kept by the compose script, is what says
    * whether the body still holds what the extension left it at. */
@@ -66,6 +83,9 @@ const start = async () => {
       radio.checked = radio.value === position;
     }
     $("#source").textContent = translate(Rules.originKey(plan, position, state.settled));
+    /* Two ticked boxes do not show which one decides, and an exact address wins over a
+     * domain: say it when the contact owes its rule to its domain alone. */
+    $("#inherited").hidden = !(stored.contact === null && stored.domain !== null);
   };
   refresh();
 
@@ -80,34 +100,48 @@ const start = async () => {
       /* The composer has the last word: it stands aside on a message with no quote, and the
        * checked radio has to come back to the position the body really has. */
       position = result.after;
+      await syncRules(targets, stored, position);
       refresh();
-      await rememberIfRequested(plan, position);
     });
   }
 
   for (const checkbox of document.querySelectorAll("#remember input")) {
-    checkbox.addEventListener("change", () => rememberIfRequested(plan, position));
+    checkbox.addEventListener("change", async () => {
+      await syncRules(targets, stored, position);
+      refresh();
+    });
   }
 };
 
-/* Remembering follows the displayed position: ticking the box after a switch saves what the
- * user sees, not the rule that brought them there. */
-const rememberIfRequested = async (plan, position) => {
-  if (position !== "above" && position !== "below") {
-    return;
-  }
-  const requests = [
-    [$("#remember-contact").checked, plan.address],
-    [$("#remember-domain").checked, plan.domain],
-  ];
-  let saved = false;
-  for (const [checked, key] of requests) {
-    if (checked) {
+/* Brings the two rules in line with the boxes, at the position on display: ticking after a
+ * switch saves what the user sees, not the rule that brought them there. Only the differences
+ * are written, so a switch made with an untouched box costs nothing. */
+const syncRules = async (targets, stored, position) => {
+  let written = null;
+
+  for (const { box, key, slot } of targets) {
+    if ($(box).checked) {
+      /* A composer with no writing area has no position worth saving yet. */
+      if (!Rules.POSITIONS.includes(position) || stored[slot] === position) {
+        continue;
+      }
       await browser.runtime.sendMessage({ type: "remember", key, position });
-      saved = true;
+      stored[slot] = position;
+      written = "popupSaved";
+    } else {
+      if (stored[slot] === null) {
+        continue;
+      }
+      await browser.runtime.sendMessage({ type: "forget", key });
+      stored[slot] = null;
+      written = "popupForgotten";
     }
   }
-  $("#confirmation").hidden = !saved;
+
+  $("#confirmation").hidden = written === null;
+  if (written) {
+    $("#confirmation").textContent = translate(written);
+  }
 };
 
 $("#options").addEventListener("click", () => {

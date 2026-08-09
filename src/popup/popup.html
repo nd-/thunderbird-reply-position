@@ -26,7 +26,6 @@
       <!-- Outside the fieldset and flush with the legend: indented under the last radio, the
          - origin reads as a caption of that one option instead of a note on the whole group. -->
       <p id="source" class="note"></p>
-      <p class="note" data-i18n="popupScope"></p>
 
       <fieldset id="remember">
         <legend data-i18n="popupRememberLegend"></legend>
@@ -38,9 +37,11 @@
           <input type="checkbox" id="remember-domain" />
           <span id="label-domain"></span>
         </label>
+        <p id="inherited" class="note" hidden data-i18n="popupInheritsDomain"></p>
       </fieldset>
 
-      <p id="confirmation" class="confirmation" hidden data-i18n="popupSaved"></p>
+      <!-- Filled by popup.js: says whether a rule was written or deleted. -->
+      <p id="confirmation" class="confirmation" hidden></p>
     </div>
 
     <button id="options" type="button" class="link" data-i18n="popupOptions"></button>

@@ -121,6 +121,26 @@ var Rules = (() => {
     }
   };
 
+  /* What the storage already holds for the two keys an address can be filed under. `explain`
+   * only names the winner: a contact rule hides the domain rule it overrides, and the popup
+   * has to tick both boxes when both exist. */
+  const rulesFor = (settings, address) => {
+    const full = { ...DEFAULT_SETTINGS, ...settings };
+    const normalized = normalize(address);
+    const domain = domainOf(normalized);
+    return {
+      contact: full.rules[normalized] ?? null,
+      domain: domain ? full.rules[domain] ?? null : null,
+    };
+  };
+
+  /* Whether that address owes its rule to its domain rather than to itself. The popup says so:
+   * two ticked boxes do not show which one decides, and an exact address wins over a domain. */
+  const inheritsFromDomain = (settings, address) => {
+    const found = rulesFor(settings, address);
+    return found.contact === null && found.domain !== null;
+  };
+
   const withRule = (settings, key, position) => {
     const normalized = normalize(key);
     if (!isKey(normalized)) {
@@ -186,6 +206,8 @@ var Rules = (() => {
     resolve,
     explain,
     originKey,
+    rulesFor,
+    inheritsFromDomain,
     withRule,
     withoutRule,
     validate,

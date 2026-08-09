@@ -66,6 +66,9 @@ const plan = async (tabId) => {
     source: explanation.source,
     address,
     domain: Rules.domainOf(address),
+    /* What the storage already holds for those two keys, so that the popup opens with the
+     * boxes reflecting the rules instead of always empty. */
+    rules: Rules.rulesFor(settings, address),
     plainText: details.isPlainText,
     /* Passed on to the compose script and to the popup: they apply, the decision stays
      * here. */

@@ -16,7 +16,6 @@
   "positionNone": { "message": "Leave unchanged" },
 
   "popupWhere": { "message": "Where to write this reply" },
-  "popupScope": { "message": "Only changes this window." },
   "popupRememberLegend": { "message": "Remember this choice" },
   "popupRememberContact": {
     "message": "for $ADDRESS$",
@@ -40,8 +39,10 @@
   "popupRuleDefault": { "message": "Default position" },
   "popupRuleOverridden": { "message": "Chosen in this window" },
   "popupRuleUntouched": { "message": "Thunderbird's own position" },
+  "popupInheritsDomain": { "message": "This contact follows its domain's rule." },
   "popupOptions": { "message": "Manage rules" },
   "popupSaved": { "message": "Rule saved" },
+  "popupForgotten": { "message": "Rule removed" },
 
   "optionsTitle": { "message": "Position rules" },
   "optionsIntro": {

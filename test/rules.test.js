@@ -168,6 +168,50 @@ describe("origin of the displayed position", () => {
   });
 });
 
+describe("rules already filed for an address", () => {
+  test("both keys are reported, the contact one not hiding the domain one", () => {
+    /* explain() only names the winner: the popup has to tick both boxes. */
+    assert.deepEqual(Rules.rulesFor(SETTINGS, "alex@example.com"), {
+      contact: "below",
+      domain: "above",
+    });
+  });
+
+  test("an address covered by its domain alone", () => {
+    assert.deepEqual(Rules.rulesFor(SETTINGS, "sam@example.com"), {
+      contact: null,
+      domain: "above",
+    });
+    assert.equal(Rules.inheritsFromDomain(SETTINGS, "sam@example.com"), true);
+  });
+
+  test("an address with its own rule does not inherit", () => {
+    assert.equal(Rules.inheritsFromDomain(SETTINGS, "alex@example.com"), false);
+  });
+
+  test("an address nothing covers", () => {
+    assert.deepEqual(Rules.rulesFor(SETTINGS, "sam@example.net"), {
+      contact: null,
+      domain: null,
+    });
+    assert.equal(Rules.inheritsFromDomain(SETTINGS, "sam@example.net"), false);
+  });
+
+  test("case and whitespace do not hide a rule", () => {
+    assert.deepEqual(Rules.rulesFor(SETTINGS, "  Alex@Example.COM "), {
+      contact: "below",
+      domain: "above",
+    });
+  });
+
+  test("empty settings report nothing rather than failing", () => {
+    assert.deepEqual(Rules.rulesFor(undefined, "alex@example.com"), {
+      contact: null,
+      domain: null,
+    });
+  });
+});
+
 describe("recipient", () => {
   test("a string is usable", () => {
     assert.equal(

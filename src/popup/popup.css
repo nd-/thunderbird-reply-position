@@ -66,6 +66,10 @@ fieldset label:last-child {
   margin-top: 0.7rem;
 }
 
+#inherited {
+  margin-top: 0.4rem;
+}
+
 .confirmation {
   margin: 0.5rem 0 0;
   opacity: 0.8;
