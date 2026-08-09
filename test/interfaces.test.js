@@ -302,6 +302,7 @@ describe("popup", () => {
     assert.equal(remember.message.key, "camille@sender.invalid");
     assert.equal(remember.message.position, "above");
     assert.equal(document.querySelector("#confirmation").hidden, false);
+    assert.equal(document.querySelector("#confirmation").textContent, "[popupSaved]");
   });
 
   test("remembering after a switch keeps the new position", async () => {
@@ -418,6 +419,92 @@ describe("popup", () => {
     assert.deepEqual(Object.keys(browser.settings.rules), []);
     assert.equal(document.querySelector("#confirmation").hidden, false);
     assert.equal(document.querySelector("#confirmation").textContent, "[popupForgotten]");
+  });
+
+  test("ticking a box in a composer with no writing area writes nothing", async () => {
+    /* "absent" is not a position a rule can hold: `Rules.withRule` throws on it, and the
+     * rejection would surface from inside an event listener. The guard is what avoids it. */
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, rules: { contact: null, domain: null } },
+      state: { position: "absent" },
+      settings: { version: 1, rules: {}, defaultAction: "none" },
+    });
+    const { document } = await openPopup(browser);
+
+    const contact = document.querySelector("#remember-contact");
+    contact.checked = true;
+    contact.dispatchEvent(new document.defaultView.Event("change"));
+    await flush();
+    await flush();
+
+    assert.equal(
+      browser.calls.some((c) => c.message?.type === "remember"),
+      false,
+    );
+    assert.equal(document.querySelector("#confirmation").hidden, true);
+  });
+
+  test("a box already at the displayed position is not written again", async () => {
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, rules: { contact: "below", domain: null } },
+      state: { position: "below" },
+      settings: {
+        version: 1,
+        rules: { "camille@sender.invalid": "below" },
+        defaultAction: "none",
+      },
+    });
+    const { document } = await openPopup(browser);
+
+    const domain = document.querySelector("#remember-domain");
+    domain.checked = true;
+    domain.dispatchEvent(new document.defaultView.Event("change"));
+    await flush();
+    await flush();
+
+    /* Only the domain moves: the contact box was ticked and already held that position. */
+    const written = browser.calls.filter((c) => c.message?.type === "remember");
+    assert.equal(written.length, 1);
+    assert.equal(written[0].message.key, "@sender.invalid");
+  });
+
+  test("unticking the contact box brings the inheritance back", async () => {
+    const browser = fakeBrowser({
+      plan: { ...FULL_PLAN, rules: { contact: "below", domain: "above" } },
+      state: { position: "below" },
+      settings: {
+        version: 1,
+        rules: { "camille@sender.invalid": "below", "@sender.invalid": "above" },
+        defaultAction: "none",
+      },
+    });
+    const { document } = await openPopup(browser);
+
+    assert.equal(document.querySelector("#inherited").hidden, true);
+
+    const contact = document.querySelector("#remember-contact");
+    contact.checked = false;
+    contact.dispatchEvent(new document.defaultView.Event("change"));
+    await flush();
+    await flush();
+
+    /* The domain rule is the only one left: the contact now owes it its position. */
+    assert.equal(document.querySelector("#inherited").hidden, false);
+  });
+
+  test("the inheritance is not mentioned when there is nothing to inherit", async () => {
+    for (const rules of [
+      { contact: "below", domain: null },
+      { contact: null, domain: null },
+    ]) {
+      const browser = fakeBrowser({ plan: { ...FULL_PLAN, rules }, state: { position: "below" } });
+      const { document } = await openPopup(browser);
+      assert.equal(
+        document.querySelector("#inherited").hidden,
+        true,
+        `rules: ${JSON.stringify(rules)}`,
+      );
+    }
   });
 
   test("a box left as it was writes nothing on a switch", async () => {
