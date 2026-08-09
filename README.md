@@ -1,7 +1,7 @@
 # Reply position per recipient
 
 Thunderbird extension that places the writing area **above or below the quote depending on
-the recipient**, with a toggle button in the compose window that switches the position.
+the recipient**, with a button in the compose window to change that position by hand.
 
 Thunderbird only offers that setting globally, per identity
 (`mail.identity.idN.reply_on_top`). Yet some correspondents reply above the quote and others
@@ -22,8 +22,11 @@ When a reply opens, the **first address of the "To" field** decides. Resolution 
 exact address to the domain, then to the default position. That default position is "leave
 unchanged": with no matching rule, Thunderbird's native behaviour stays intact.
 
-The button in the compose window switches the position and offers to remember the choice for
-the contact or for their whole domain.
+The button in the compose window opens a popup showing where the reply currently sits, as a
+pair of radio buttons. Picking the other one moves the quote block, and one Ctrl+Z puts it
+back: the rearrangement is replayed through the editor so that it counts as a single undo
+transaction. Two checkboxes in the same popup save the position as a rule, for the contact or
+for their whole domain.
 
 Rules are stored in the `storage.local` of the extension. The address book is neither read nor
 modified.
@@ -46,7 +49,7 @@ options page decides that case, by default in favour of the reply text.
 - **Only the first address of the "To" field is consulted.** Other recipients and the "Cc"
   fields are ignored.
 - **A forward opens with no recipient**: no rule can apply as long as the "To" field is empty.
-  The toggle button stays available, and a default position other than "leave unchanged" will
+  The compose button stays available, and a default position other than "leave unchanged" will
   apply.
 - In **"select the quote"** mode, the composer has no writing area. When a rule applies, the
   extension creates one and collapses the selection: the quote is preserved, but the habit of
@@ -57,12 +60,20 @@ options page decides that case, by default in favour of the reply text.
 ```bash
 npm install
 npm test            # unit tests under jsdom, without Thunderbird
+npm run lint        # web-ext lint, the same report the ATN reviewer reads
+npm run build       # the XPI, into web-ext-artifacts/
 npm run capture     # captures the DOM Thunderbird produces, in a disposable profile
 npm run verify      # loads the extension in Thunderbird and checks its effect
 ```
 
+`npm test` and `npm run lint` also run in continuous integration; `capture` and `verify` do
+not, since no runner has a Thunderbird to start.
+
 `npm run capture` and `npm run verify` start Thunderbird headless, on a fresh profile created
-for the occasion, with no network and no mail account. See
+for the occasion. That profile holds a POP3 account on a host under `.invalid`, which no
+resolver answers: Thunderbird can therefore neither fetch nor send anything, and the test
+messages are injected straight into its inbox. The one network call of the whole harness is
+made by node before startup, to fetch the language pack described under *Licence*. See
 [test/integration/README.md](test/integration/README.md).
 
 The publishable extension lives in `src/`, separate from the test tooling. The testable logic
@@ -74,8 +85,10 @@ a dedicated profile: the extension rewrites the body of the messages being compo
 
 ## Licence
 
-[MPL-2.0](LICENSE). Every file under `src/` carries the header, and a copy of the licence
-ships inside the extension itself (`src/LICENSE`).
+[MPL-2.0](LICENSE). Every file under `src/` carries the header, the three JSON files excepted
+(`manifest.json` and the two `_locales/*/messages.json`): JSON has no comment syntax, and a
+key added for that purpose would be read as data. A copy of the licence ships inside the
+extension itself (`src/LICENSE`).
 
 The published add-on embeds **no third-party code**. Every file under `src/` is original;
 nothing is bundled, minified or loaded from a remote host, as the ATN review requires.
