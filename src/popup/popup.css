@@ -2,12 +2,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+/* See the same declaration in options.css: without it the panel stays white inside a dark
+ * Thunderbird, and the system colour keywords resolve to their light variants. */
+:root {
+  color-scheme: light dark;
+}
+
 body {
   min-width: 17rem;
   margin: 0;
   padding: 0.75rem;
   font: message-box;
   font-size: 1rem;
+  background: Canvas;
+  color: CanvasText;
 }
 
 p {

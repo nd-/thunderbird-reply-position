@@ -2,6 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+/* Without this declaration the page renders with the light defaults whatever the theme, and
+ * the system colour keywords used further down resolve to their light variants too: a white
+ * rectangle inside a dark Thunderbird. Declaring both schemes is what lets Canvas, CanvasText
+ * and their kin follow the theme on their own, with no media query and no palette of ours. */
+:root {
+  color-scheme: light dark;
+}
+
 body {
   max-width: 44rem;
   margin: 0 auto;
@@ -9,6 +17,8 @@ body {
   font: message-box;
   font-size: 1rem;
   line-height: 1.5;
+  background: Canvas;
+  color: CanvasText;
 }
 
 h1 {
