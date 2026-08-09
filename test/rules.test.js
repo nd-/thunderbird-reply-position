@@ -81,6 +81,93 @@ describe("explanation", () => {
   });
 });
 
+describe("origin of the displayed position", () => {
+  /* The popup shows the position read from the DOM, and next to it where it comes from. */
+  /* [name, explanation, position, settled, expected] */
+  const CASES = [
+    [
+      "a rule on the contact",
+      { target: "below", source: "contact" },
+      "below",
+      "below",
+      "popupRuleContact",
+    ],
+    [
+      "a rule on the domain",
+      { target: "above", source: "domain" },
+      "above",
+      "above",
+      "popupRuleDomain",
+    ],
+    [
+      "the default position",
+      { target: "above", source: "default" },
+      "above",
+      "above",
+      "popupRuleDefault",
+    ],
+    [
+      "no rule and no default: Thunderbird keeps its own layout",
+      { target: "none", source: "default" },
+      "below",
+      "below",
+      "popupRuleUntouched",
+    ],
+    [
+      "moved by hand away from a rule",
+      { target: "below", source: "contact" },
+      "above",
+      "below",
+      "popupRuleOverridden",
+    ],
+    [
+      "moved by hand with no rule at all",
+      /* The case the flag kept in the panel could not survive: with no rule the chosen
+       * position and Thunderbird's own are told apart by `settled` alone. */
+      { target: "none", source: "default" },
+      "below",
+      "above",
+      "popupRuleOverridden",
+    ],
+    [
+      "moved by hand, then moved back",
+      { target: "none", source: "default" },
+      "above",
+      "above",
+      "popupRuleUntouched",
+    ],
+  ];
+
+  for (const [name, explanation, position, settled, expected] of CASES) {
+    test(name, () => {
+      assert.equal(Rules.originKey(explanation, position, settled), expected);
+    });
+  }
+
+  test("without `settled`, a body contradicting its rule still reads as a hand move", () => {
+    assert.equal(
+      Rules.originKey({ target: "below", source: "contact" }, "above"),
+      "popupRuleOverridden",
+    );
+  });
+
+  test("a composer with no writing area is not attributed to the rule", () => {
+    /* reply_on_top=2 opens with the quote selected and no writing paragraph at all. */
+    assert.equal(
+      Rules.originKey({ target: "below", source: "contact" }, "absent", "below"),
+      "popupRuleOverridden",
+    );
+  });
+
+  test("the return value of explain() is accepted as is", () => {
+    /* explain() names the field `position`, the plan names it `target`: both go through. */
+    assert.equal(
+      Rules.originKey(Rules.explain(SETTINGS, "alex@example.com"), "below"),
+      "popupRuleContact",
+    );
+  });
+});
+
 describe("recipient", () => {
   test("a string is usable", () => {
     assert.equal(

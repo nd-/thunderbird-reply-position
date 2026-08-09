@@ -83,6 +83,44 @@ var Rules = (() => {
     return { position: full.defaultAction, source: "default", key: null };
   };
 
+  /* Which message key explains the position the popup is showing.
+   *
+   * Three arguments, three facts: what the settings asked for, what the body holds now, and
+   * `settled`, the position the body had once the extension had had its say. A choice made by
+   * hand shows up as `position !== settled`, and that comparison is the only way to name it:
+   * the panel is destroyed every time it closes, so it cannot remember having been used, and
+   * with no rule at all the chosen position and Thunderbird's own are otherwise
+   * indistinguishable. `settled` is kept by the compose script, which lives as long as the
+   * window.
+   *
+   * Kept here rather than in the popup because it is a decision, and decisions stay out of
+   * the files that touch the APIs. */
+  const originKey = (explanation, position, settled) => {
+    const target = explanation?.target ?? explanation?.position;
+    /* The body no longer holds what the extension left: someone moved it from the panel. */
+    if (settled !== undefined && position !== settled) {
+      return "popupRuleOverridden";
+    }
+    /* No rule and no default: nothing was applied, the composer kept the layout Thunderbird
+     * gave it. Tested before the mismatch below, which "none" would always trigger. */
+    if (target === "none" || target === undefined) {
+      return "popupRuleUntouched";
+    }
+    /* Fallback for a caller that cannot supply `settled`: a body contradicting its own rule
+     * was necessarily moved by hand. */
+    if (position !== target) {
+      return "popupRuleOverridden";
+    }
+    switch (explanation?.source) {
+      case "contact":
+        return "popupRuleContact";
+      case "domain":
+        return "popupRuleDomain";
+      default:
+        return "popupRuleDefault";
+    }
+  };
+
   const withRule = (settings, key, position) => {
     const normalized = normalize(key);
     if (!isKey(normalized)) {
@@ -147,6 +185,7 @@ var Rules = (() => {
     usableAddress,
     resolve,
     explain,
+    originKey,
     withRule,
     withoutRule,
     validate,
