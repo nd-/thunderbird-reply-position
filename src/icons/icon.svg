@@ -1,4 +1,7 @@
 <svg width="128" height="128" version="1.1" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+	<!-- Add-on icon: add-ons manager and addons.thunderbird.net listing. This is the reference
+		drawing; compose-action.svg and compose-action-light.svg redraw it on the 16 unit grid for
+		the toolbar button, where scaling this file down comes out pale and blurred. -->
 	<path d="m51.7 41.7c1.73-1.69 1.73-4.41 0-6.12l-10.5-10.3c-0.808-0.825-1.95-1.34-3.21-1.34s-2.38 0.506-3.19 1.33l-10.5 10.3c-1.73 1.69-1.73 4.41 0 6.12 1.73 1.69 4.52 1.69 6.28 0l3.01-2.94v30.9c0 2.39 1.98 4.33 4.44 4.33 2.45 0 4.44-1.94 4.44-4.33v-30.9l3.01 2.94c1.73 1.69 4.52 1.69 6.28 0z" fill="#0064df"/>
 	<path d="m77.3 86.3c-1.73 1.69-1.73 4.41 0 6.12l10.5 10.3c0.808 0.825 1.95 1.34 3.21 1.34s2.38-0.506 3.19-1.33l10.5-10.3c1.73-1.69 1.73-4.41 0-6.12-1.73-1.69-4.52-1.69-6.28 0l-3.01 2.94v-30.9c0-2.39-1.98-4.33-4.44-4.33-2.45 0-4.44 1.94-4.44 4.33v30.9l-3.01-2.94c-1.73-1.69-4.52-1.69-6.28 0z" fill="#0064df"/>
 	<path d="m72 76.8c0 9.45-7.72 17.2-17.3 17.2h-33.4c-9.52 0-17.3-7.66-17.3-17.2v-55.6c0-9.45 7.72-17.2 17.3-17.2h33.4c9.52 0 17.3 7.66 17.3 17.2zm-17.3 8.74c4.84 0 8.8-3.92 8.8-8.74v-55.6c0-4.8-3.94-8.74-8.8-8.74h-33.4c-4.84 0-8.8 3.92-8.8 8.74v55.6c0 4.8 3.94 8.74 8.8 8.74z" clip-rule="evenodd" fill="#9a9996" fill-rule="evenodd" style="paint-order:markers stroke fill"/>
