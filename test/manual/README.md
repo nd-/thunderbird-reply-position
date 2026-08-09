@@ -186,6 +186,37 @@ user_pref("extensions.webextensions.ExtensionStorageIDB.enabled", false);
 the JSON file above. Without it the add-on reads the other one, finds nothing, and appears to do
 nothing at all, with no error anywhere — the most misleading symptom this project has met.
 
+## 5b. What the individual checks need
+
+Two of the checks need the profile arranged further. Both are preferences, so both go into the
+same `user.js` and are undone with it.
+
+**A dark interface**, for the rendering check. The built-in dark theme is a disabled add-on and
+enabling it would mean editing the add-on database by hand; the system preference is a better
+route, because the default theme follows it *and* so does `prefers-color-scheme` for content,
+which is what `background.js` reads through `matchMedia` to swap the toolbar icon. One value
+therefore exercises the very path the icon switching depends on. Back to light with `0`.
+
+```javascript
+user_pref("ui.systemUsesDarkTheme", 1);
+```
+
+**A signature on replies**, for the swap-replay check, attached to the writing area rather than
+closing the message. That is the arrangement the 7 August 2026 defect came from: once the
+signature had gone down with the reply, it never came back up. Set `sig_bottom` to `true` to try
+the other one.
+
+```javascript
+user_pref("mail.identity.idN.sig_on_reply", true);
+user_pref("mail.identity.idN.sig_bottom", false);
+user_pref("mail.identity.idN.attach_signature", false);
+user_pref("mail.identity.idN.htmlSigFormat", true);
+user_pref("mail.identity.idN.htmlSigText", "<div>-- <br>Nico<br>nico@example.com</div>");
+```
+
+Plain text is the other half of that check, and it is a per-account setting rather than a
+preference: untick *Compose messages in HTML format* in the account settings.
+
 ## 6. Start, and check
 
 ```bash
@@ -225,16 +256,26 @@ when started from a terminal, which puts its windows in the X server and makes t
 by id:
 
 ```bash
-xwininfo -root -children | grep -i thunderbird     # read the id
-import -window 0x1a00017 composer.png
+xwininfo -root -children | grep -i thunderbird     # read the id, e.g. 0x1a00017
+import -window <id> composer.png
 ```
 
 A full-screen capture through the compositor comes out black, the X11 tools seeing nothing of a
-native Wayland client.
+native Wayland client. Two consequences of capturing that way, both of which decide which shots
+can be taken by hand and which cannot:
 
-Two views are worth having: the composer with the reply above the quote and the *Reply position*
-button in the toolbar, and the same window with the popup open and the reply moved below. The
-options page, with its populated table, makes a third.
+- **`import` does not capture the mouse pointer**, where the desktop screenshot tool does. A
+  stray cursor over the text is reason enough to recapture this way rather than retouch.
+- **The popup is a window of its own**, so a capture of the composer by id leaves it out. Any
+  shot showing both has to come from the desktop tool, and will carry the pointer and a wedge
+  of wallpaper wherever the popup overhangs the composer. That wedge cannot be cropped away
+  without cutting the popup.
+
+Three views are worth having: the composer with the reply above the quote and the *Reply
+position* button in the toolbar, the same window with the popup open and the reply moved below,
+and the options page with its populated table. Type a line of reply text before shooting the
+first two: with an empty writing area, nothing shows where the reply actually goes, which is the
+whole subject.
 
 ## Undoing all of it
 
