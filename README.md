@@ -9,6 +9,11 @@ below, and the right habit depends on who you are writing to, not on the account
 
 Manifest V3, Thunderbird 140 ESR and later. MPL-2.0 licence.
 
+## Install
+
+[Reply Position per Recipient](https://addons.thunderbird.net/thunderbird/addon/reply-position-per-recipient/)
+on addons.thunderbird.net. Thunderbird updates it on its own from there.
+
 ## How it works
 
 A rule maps an address or a domain to a position:
